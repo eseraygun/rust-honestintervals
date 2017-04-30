@@ -1,6 +1,7 @@
 use super::def::Mpfr;
 
-use float::{Float, RoundingMode};
+use fp;
+use fp::{RoundingMode};
 use transc::Transc;
 
 impl Transc for Mpfr {
@@ -8,34 +9,35 @@ impl Transc for Mpfr {
 
     #[inline]
     fn log(self) -> Self::Output {
-        Float::log(&self, RoundingMode::HalfToEven)
+        fp::Transc::log(self, RoundingMode::HalfToEven)
     }
 
     #[inline]
     fn exp(self) -> Self::Output {
-        Float::exp(&self, RoundingMode::HalfToEven)
+        fp::Transc::exp(self, RoundingMode::HalfToEven)
     }
 }
 
-impl<'a> Transc for &'a Mpfr {
-    type Output = Mpfr;
-
-    #[inline]
-    fn log(self) -> Self::Output {
-        Float::log(self, RoundingMode::HalfToEven)
-    }
-
-    #[inline]
-    fn exp(self) -> Self::Output {
-        Float::exp(self, RoundingMode::HalfToEven)
-    }
-}
+//impl<'a> Transc for &'a Mpfr {
+//    type Output = Mpfr;
+//
+//    #[inline]
+//    fn log(self) -> Self::Output {
+//        Float::log(self, RoundingMode::HalfToEven)
+//    }
+//
+//    #[inline]
+//    fn exp(self) -> Self::Output {
+//        Float::exp(self, RoundingMode::HalfToEven)
+//    }
+//}
 
 #[cfg(test)]
 mod test {
     use super::super::def::Mpfr;
 
-    use float::{Float, RoundingMode};
+    use fp;
+    use fp::{Float, RoundingMode};
     use transc::Transc;
 
     #[test]

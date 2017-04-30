@@ -1,7 +1,8 @@
 use super::capi::*;
-use super::def::Mpfr;
+use super::def::{Mpfr, ParseMpfrError};
 
-use float::{Float, RoundingMode};
+use fp;
+use fp::{Float, RoundingMode};
 
 use std::fmt;
 use std::fmt::{Display, Formatter};
@@ -83,19 +84,15 @@ impl Drop for Mpfr {
 impl From<f64> for Mpfr {
     #[inline]
     fn from(val: f64) -> Self {
-        Self::custom_from_f64(val, 53, RoundingMode::HalfToEven)
+        <Self as fp::From<f64>>::from(val, 53, RoundingMode::HalfToEven)
     }
 }
 
 impl FromStr for Mpfr {
-    type Err = ();
+    type Err = ParseMpfrError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if let Some(z) = Self::custom_from_str(s, 10, 53, RoundingMode::HalfToEven) {
-            Ok(z)
-        } else {
-            Err(())
-        }
+        <Self as fp::FromStr>::from_str(s, 53, RoundingMode::HalfToEven)
     }
 }
 
@@ -121,7 +118,7 @@ impl Display for Mpfr {
 impl Into<f64> for Mpfr {
     #[inline]
     fn into(self) -> f64 {
-        self.to_f64(RoundingMode::HalfToEven)
+        fp::Into::<f64>::into(self, RoundingMode::HalfToEven)
     }
 }
 
@@ -136,14 +133,17 @@ impl<'a> Into<f64> for &'a Mpfr {
 mod test {
     use super::super::def::Mpfr;
 
-    use float::{Float, RoundingMode};
+    use fp;
+    use fp::RoundingMode;
 
     use std::str::FromStr;
     use std::f64;
 
     #[test]
     fn test_from_f64() {
-        assert_str_eq!("-123.456", Mpfr::from(-123.456));
+        assert_str_eq!("0", Mpfr::from(0f64));
+        assert_str_eq!("0.123", Mpfr::from(0.123));
+        assert_str_eq!("-1.23", Mpfr::from(-1.23));
         assert_str_eq!("inf", Mpfr::from(f64::INFINITY));
         assert_str_eq!("-inf", Mpfr::from(f64::NEG_INFINITY));
         assert_str_eq!("NaN", Mpfr::from(f64::NAN));
@@ -151,7 +151,9 @@ mod test {
 
     #[test]
     fn test_from_str() {
-        assert_str_eq!("-123.456", <Mpfr as FromStr>::from_str("-123.456").unwrap());
+        assert_str_eq!("0", <Mpfr as FromStr>::from_str("0").unwrap());
+        assert_str_eq!("0.123", <Mpfr as FromStr>::from_str("0.123").unwrap());
+        assert_str_eq!("-1.23", <Mpfr as FromStr>::from_str("-1.23").unwrap());
         assert_str_eq!("inf", <Mpfr as FromStr>::from_str("inf").unwrap());
         assert_str_eq!("-inf", <Mpfr as FromStr>::from_str("-inf").unwrap());
         assert_str_eq!("NaN", <Mpfr as FromStr>::from_str("NaN").unwrap());

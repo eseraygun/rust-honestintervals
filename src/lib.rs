@@ -2,7 +2,7 @@ extern crate libc;
 
 #[macro_use]
 mod macros;
-pub mod float;
+pub mod fp;
 pub mod transc;
 pub mod mpfr;
 

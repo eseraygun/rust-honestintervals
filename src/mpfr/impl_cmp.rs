@@ -56,7 +56,8 @@ impl PartialOrd<Mpfr> for Mpfr {
 mod test {
     use super::super::def::Mpfr;
 
-    use float::{Float, RoundingMode};
+    use fp;
+    use fp::{Float, RoundingMode};
 
     use std::cmp::Ordering;
 

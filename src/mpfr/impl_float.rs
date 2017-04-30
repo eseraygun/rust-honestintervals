@@ -1,11 +1,143 @@
 use super::capi::*;
-use super::def::Mpfr;
+use super::def::{Mpfr, ParseMpfrError};
 
-use float::{Float, RoundingMode, Sign};
+use fp;
+use fp::{Float, RoundingMode, Sign};
 
-use libc::c_int;
 use std::ffi::CString;
 use std::mem::uninitialized;
+use std::ops;
+
+impl fp::From<f64> for Mpfr {
+    #[inline]
+    fn from(val: f64, precision: usize, rounding_mode: RoundingMode) -> Self {
+        Self::new(precision).set_f64(val, MpfrRnd::from(rounding_mode))
+    }
+}
+
+impl fp::FromStr for Mpfr {
+    type Err = ParseMpfrError;
+
+    #[inline]
+    fn from_str(s: &str, precision: usize, rounding_mode: RoundingMode) -> Result<Self, Self::Err> {
+        if let Ok(c_val) = CString::new(s) {
+            let mut mpfr = unsafe { uninitialized() };
+            unsafe {
+                mpfr_init2(&mut mpfr, precision as MpfrPrec);
+            }
+            let ret = unsafe {
+                mpfr_set_str(&mut mpfr, c_val.as_ptr(), 10, MpfrRnd::from(rounding_mode))
+            };
+            if ret == 0 {
+                Ok(Mpfr { mpfr: mpfr })
+            } else {
+                Err(ParseMpfrError::MpfrError)
+            }
+        } else {
+            Err(ParseMpfrError::CStringError)
+        }
+    }
+}
+
+impl fp::Into<f64> for Mpfr {
+    fn into(self, rounding_mode: RoundingMode) -> f64 {
+        unsafe { mpfr_get_d(&self.mpfr, MpfrRnd::from(rounding_mode)) }
+    }
+}
+
+impl fp::MinMax<Mpfr> for Mpfr {
+    type Output = Mpfr;
+
+    fn min(mut self, rhs: Mpfr) -> Mpfr {
+        unsafe { mpfr_min(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::HalfToEven); }
+        self
+    }
+
+    fn max(mut self, rhs: Mpfr) -> Mpfr {
+        unsafe { mpfr_max(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::HalfToEven); }
+        self
+    }
+}
+
+impl ops::Neg for Mpfr {
+    type Output = Mpfr;
+
+    #[inline]
+    fn neg(mut self) -> Self::Output {
+        unsafe { mpfr_neg(&mut self.mpfr, &self.mpfr, MpfrRnd::HalfToEven); }
+        self
+    }
+}
+
+impl fp::Abs for Mpfr {
+    type Output = Mpfr;
+
+    #[inline]
+    fn abs(mut self) -> Self::Output {
+        unsafe { mpfr_abs(&mut self.mpfr, &self.mpfr, MpfrRnd::HalfToEven); }
+        self
+    }
+}
+
+impl fp::Add<Mpfr> for Mpfr {
+    type Output = Mpfr;
+
+    #[inline]
+    fn add(mut self, rhs: Mpfr, rounding_mode: RoundingMode) -> Self::Output {
+        assert_eq!(self.precision(), rhs.precision());
+        unsafe { mpfr_add(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::from(rounding_mode)); }
+        self
+    }
+}
+
+impl fp::Sub<Mpfr> for Mpfr {
+    type Output = Mpfr;
+
+    #[inline]
+    fn sub(mut self, rhs: Mpfr, rounding_mode: RoundingMode) -> Self::Output {
+        assert_eq!(self.precision(), rhs.precision());
+        unsafe { mpfr_sub(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::from(rounding_mode)); }
+        self
+    }
+}
+
+impl fp::Mul<Mpfr> for Mpfr {
+    type Output = Mpfr;
+
+    #[inline]
+    fn mul(mut self, rhs: Mpfr, rounding_mode: RoundingMode) -> Self::Output {
+        assert_eq!(self.precision(), rhs.precision());
+        unsafe { mpfr_mul(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::from(rounding_mode)); }
+        self
+    }
+}
+
+impl fp::Div<Mpfr> for Mpfr {
+    type Output = Mpfr;
+
+    #[inline]
+    fn div(mut self, rhs: Mpfr, rounding_mode: RoundingMode) -> Self::Output {
+        assert_eq!(self.precision(), rhs.precision());
+        unsafe { mpfr_div(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::from(rounding_mode)); }
+        self
+    }
+}
+
+impl fp::Transc for Mpfr {
+    type Output = Mpfr;
+
+    #[inline]
+    fn log(mut self, rounding_mode: RoundingMode) -> Mpfr {
+        unsafe { mpfr_log(&mut self.mpfr, &self.mpfr, MpfrRnd::from(rounding_mode)); }
+        self
+    }
+
+    #[inline]
+    fn exp(mut self, rounding_mode: RoundingMode) -> Mpfr {
+        unsafe { mpfr_exp(&mut self.mpfr, &self.mpfr, MpfrRnd::from(rounding_mode)); }
+        self
+    }
+}
 
 impl Float for Mpfr {
     #[inline]
@@ -39,38 +171,15 @@ impl Float for Mpfr {
     }
 
     #[inline]
-    fn custom_from_f64(val: f64, precision: usize, rounding_mode: RoundingMode) -> Self {
-        Self::new(precision).set_f64(val, MpfrRnd::from(rounding_mode))
-    }
-
-    fn custom_from_str(s: &str,
-                       base: usize,
-                       precision: usize,
-                       rounding_mode: RoundingMode)
-                       -> Option<Self>
-    {
-        if let Ok(c_val) = CString::new(s) {
-            let mut mpfr = unsafe { uninitialized() };
-            unsafe {
-                mpfr_init2(&mut mpfr, precision as MpfrPrec);
-            }
-            let ret = unsafe {
-                mpfr_set_str(&mut mpfr, c_val.as_ptr(),
-                             base as c_int, MpfrRnd::from(rounding_mode))
-            };
-            if ret == 0 {
-                Some(Mpfr { mpfr: mpfr })
-            } else {
-                None
-            }
+    fn sign(&self) -> Sign {
+        let sgn = unsafe { mpfr_sgn(&self.mpfr) };
+        if sgn < 0 {
+            Sign::Negative
+        } else if sgn > 0 {
+            Sign::Positive
         } else {
-            None
+            Sign::Zero
         }
-    }
-
-    #[inline]
-    fn to_f64(&self, rounding_mode: RoundingMode) -> f64 {
-        unsafe { mpfr_get_d(&self.mpfr, MpfrRnd::from(rounding_mode)) }
     }
 
     #[inline]
@@ -102,95 +211,118 @@ impl Float for Mpfr {
     fn is_nan(&self) -> bool {
         unsafe { mpfr_nan_p(&self.mpfr) != 0 }
     }
-
-    #[inline]
-    fn sign(&self) -> Sign {
-        let sgn = unsafe { mpfr_sgn(&self.mpfr) };
-        if sgn < 0 {
-            Sign::Negative
-        } else if sgn > 0 {
-            Sign::Positive
-        } else {
-            Sign::Zero
-        }
-    }
-
-    #[inline]
-    fn neg(&self) -> Self {
-        let mut z = Self::new(self.precision());
-        unsafe { mpfr_neg(&mut z.mpfr, &self.mpfr, MpfrRnd::HalfToEven); }
-        z
-    }
-
-    #[inline]
-    fn abs(&self) -> Self {
-        let mut z = Self::new(self.precision());
-        unsafe { mpfr_abs(&mut z.mpfr, &self.mpfr, MpfrRnd::HalfToEven); }
-        z
-    }
-
-    #[inline]
-    fn add(&self, other: &Self, rounding_mode: RoundingMode) -> Self {
-        let mut z = Self::new(self.precision());
-        unsafe { mpfr_add(&mut z.mpfr, &self.mpfr, &other.mpfr, MpfrRnd::from(rounding_mode)); }
-        z
-    }
-
-    #[inline]
-    fn sub(&self, other: &Self, rounding_mode: RoundingMode) -> Self {
-        let mut z = Self::new(self.precision());
-        unsafe { mpfr_sub(&mut z.mpfr, &self.mpfr, &other.mpfr, MpfrRnd::from(rounding_mode)); }
-        z
-    }
-
-    #[inline]
-    fn mul(&self, other: &Self, rounding_mode: RoundingMode) -> Self {
-        let mut z = Self::new(self.precision());
-        unsafe { mpfr_mul(&mut z.mpfr, &self.mpfr, &other.mpfr, MpfrRnd::from(rounding_mode)); }
-        z
-    }
-
-    #[inline]
-    fn div(&self, other: &Self, rounding_mode: RoundingMode) -> Self {
-        let mut z = Self::new(self.precision());
-        unsafe { mpfr_div(&mut z.mpfr, &self.mpfr, &other.mpfr, MpfrRnd::from(rounding_mode)); }
-        z
-    }
-
-    #[inline]
-    fn log(&self, rounding_mode: RoundingMode) -> Self {
-        let mut z = Self::new(self.precision());
-        unsafe { mpfr_log(&mut z.mpfr, &self.mpfr, MpfrRnd::from(rounding_mode)); }
-        z
-    }
-
-    #[inline]
-    fn exp(&self, rounding_mode: RoundingMode) -> Self {
-        let mut z = Self::new(self.precision());
-        unsafe { mpfr_exp(&mut z.mpfr, &self.mpfr, MpfrRnd::from(rounding_mode)); }
-        z
-    }
-
-    fn min(&self, other: &Self, rounding_mode: RoundingMode) -> Self {
-        let mut z = Self::new(self.precision());
-        unsafe { mpfr_min(&mut z.mpfr, &self.mpfr, &other.mpfr, MpfrRnd::from(rounding_mode)); }
-        z
-    }
-
-    fn max(&self, other: &Self, rounding_mode: RoundingMode) -> Self {
-        let mut z = Self::new(self.precision());
-        unsafe { mpfr_max(&mut z.mpfr, &self.mpfr, &other.mpfr, MpfrRnd::from(rounding_mode)); }
-        z
-    }
 }
 
 #[cfg(test)]
 mod test {
     use super::super::def::Mpfr;
 
-    use float::{Float, RoundingMode};
+    use fp;
+    use fp::{Abs, Float, MinMax, RoundingMode, Sign};
 
     use std::f64;
+
+    #[test]
+    fn test_from_f64() {
+        assert_str_eq!("1", <Mpfr as fp::From<f64>>::from(1.1, 2, RoundingMode::HalfToEven));
+        assert_str_eq!("2", <Mpfr as fp::From<f64>>::from(2.5, 2, RoundingMode::HalfToEven));
+        assert_str_eq!("4", <Mpfr as fp::From<f64>>::from(3.5, 2, RoundingMode::HalfToEven));
+        assert_str_eq!("-2", <Mpfr as fp::From<f64>>::from(-2.5, 2, RoundingMode::HalfToEven));
+        assert_str_eq!("-4", <Mpfr as fp::From<f64>>::from(-3.5, 2, RoundingMode::HalfToEven));
+
+        assert_str_eq!("1.5", <Mpfr as fp::From<f64>>::from(1.1, 2, RoundingMode::HalfAwayFromZero));
+        assert_str_eq!("3", <Mpfr as fp::From<f64>>::from(2.5, 2, RoundingMode::HalfAwayFromZero));
+        assert_str_eq!("4", <Mpfr as fp::From<f64>>::from(3.5, 2, RoundingMode::HalfAwayFromZero));
+        assert_str_eq!("-3", <Mpfr as fp::From<f64>>::from(-2.5, 2, RoundingMode::HalfAwayFromZero));
+        assert_str_eq!("-4", <Mpfr as fp::From<f64>>::from(-3.5, 2, RoundingMode::HalfAwayFromZero));
+
+        assert_str_eq!("1", <Mpfr as fp::From<f64>>::from(1.1, 2, RoundingMode::Down));
+        assert_str_eq!("2", <Mpfr as fp::From<f64>>::from(2.5, 2, RoundingMode::Down));
+        assert_str_eq!("3", <Mpfr as fp::From<f64>>::from(3.5, 2, RoundingMode::Down));
+        assert_str_eq!("-3", <Mpfr as fp::From<f64>>::from(-2.5, 2, RoundingMode::Down));
+        assert_str_eq!("-4", <Mpfr as fp::From<f64>>::from(-3.5, 2, RoundingMode::Down));
+
+        assert_str_eq!("1.5", <Mpfr as fp::From<f64>>::from(1.1, 2, RoundingMode::Up));
+        assert_str_eq!("3", <Mpfr as fp::From<f64>>::from(2.5, 2, RoundingMode::Up));
+        assert_str_eq!("4", <Mpfr as fp::From<f64>>::from(3.5, 2, RoundingMode::Up));
+        assert_str_eq!("-2", <Mpfr as fp::From<f64>>::from(-2.5, 2, RoundingMode::Up));
+        assert_str_eq!("-3", <Mpfr as fp::From<f64>>::from(-3.5, 2, RoundingMode::Up));
+
+        assert_str_eq!("1", <Mpfr as fp::From<f64>>::from(1.1, 2, RoundingMode::TowardsZero));
+        assert_str_eq!("2", <Mpfr as fp::From<f64>>::from(2.5, 2, RoundingMode::TowardsZero));
+        assert_str_eq!("3", <Mpfr as fp::From<f64>>::from(3.5, 2, RoundingMode::TowardsZero));
+        assert_str_eq!("-2", <Mpfr as fp::From<f64>>::from(-2.5, 2, RoundingMode::TowardsZero));
+        assert_str_eq!("-3", <Mpfr as fp::From<f64>>::from(-3.5, 2, RoundingMode::TowardsZero));
+
+        assert_str_eq!("1.5", <Mpfr as fp::From<f64>>::from(1.1, 2, RoundingMode::AwayFromZero));
+        assert_str_eq!("3", <Mpfr as fp::From<f64>>::from(2.5, 2, RoundingMode::AwayFromZero));
+        assert_str_eq!("4", <Mpfr as fp::From<f64>>::from(3.5, 2, RoundingMode::AwayFromZero));
+        assert_str_eq!("-3", <Mpfr as fp::From<f64>>::from(-2.5, 2, RoundingMode::AwayFromZero));
+        assert_str_eq!("-4", <Mpfr as fp::From<f64>>::from(-3.5, 2, RoundingMode::AwayFromZero));
+    }
+
+    #[test]
+    fn test_from_str() {
+        assert_str_eq!("1", <Mpfr as fp::FromStr>::from_str("1.1", 2, RoundingMode::HalfToEven).unwrap());
+        assert_str_eq!("inf", <Mpfr as fp::FromStr>::from_str("inf", 2, RoundingMode::HalfToEven).unwrap());
+        assert_str_eq!("-inf", <Mpfr as fp::FromStr>::from_str("-inf", 2, RoundingMode::HalfToEven).unwrap());
+        assert_str_eq!("NaN", <Mpfr as fp::FromStr>::from_str("NaN", 2, RoundingMode::HalfToEven).unwrap());
+        assert!(<Mpfr as fp::FromStr>::from_str("1a1", 2, RoundingMode::HalfToEven).is_err());
+        assert!(<Mpfr as fp::FromStr>::from_str("1\0.1", 2, RoundingMode::HalfToEven).is_err());
+    }
+
+    #[test]
+    fn test_into_f64() {
+        assert_eq!(0.0, fp::Into::<f64>::into(mpfr!(0), RoundingMode::HalfToEven));
+        assert_eq!(1.0, fp::Into::<f64>::into(mpfr!(1), RoundingMode::HalfToEven));
+        assert_eq!(f64::INFINITY, fp::Into::<f64>::into(mpfr_inf!(), RoundingMode::HalfToEven));
+        assert_eq!(f64::NEG_INFINITY, fp::Into::<f64>::into(mpfr_neg_inf!(), RoundingMode::HalfToEven));
+        assert!(fp::Into::<f64>::into(mpfr_nan!(), RoundingMode::HalfToEven).is_nan());
+    }
+
+    #[test]
+    fn test_min() {
+        assert_str_eq!("0", mpfr!(0).min(mpfr!(0)));
+        assert_str_eq!("0", mpfr!(0).min(mpfr!(1)));
+        assert_str_eq!("0", mpfr!(1).min(mpfr!(0)));
+        assert_str_eq!("-1", mpfr!(-1).min(mpfr!(0)));
+        assert_str_eq!("-1", mpfr!(1).min(mpfr!(-1)));
+        assert_str_eq!("0", mpfr!(0).min(mpfr_nan!()));
+        assert_str_eq!("0", mpfr!(0).min(mpfr_inf!()));
+        assert_str_eq!("-inf", mpfr!(0).min(mpfr_neg_inf!()));
+    }
+
+    #[test]
+    fn test_max() {
+        assert_str_eq!("0", mpfr!(0).max(mpfr!(0)));
+        assert_str_eq!("1", mpfr!(0).max(mpfr!(1)));
+        assert_str_eq!("1", mpfr!(1).max(mpfr!(0)));
+        assert_str_eq!("0", mpfr!(-1).max(mpfr!(0)));
+        assert_str_eq!("1", mpfr!(1).max(mpfr!(-1)));
+        assert_str_eq!("0", mpfr!(0).max(mpfr_nan!()));
+        assert_str_eq!("inf", mpfr!(0).max(mpfr_inf!()));
+        assert_str_eq!("0", mpfr!(0).max(mpfr_neg_inf!()));
+    }
+
+    #[test]
+    fn test_neg() {
+        assert_str_eq!("0", -mpfr!(0));
+        assert_str_eq!("-1", -mpfr!(1));
+        assert_str_eq!("1", -mpfr!(-1));
+        assert_str_eq!("NaN", -mpfr_nan!());
+        assert_str_eq!("-inf", -mpfr_inf!());
+        assert_str_eq!("inf", -mpfr_neg_inf!());
+    }
+
+    #[test]
+    fn test_abs() {
+        assert_str_eq!("0", mpfr!(0).abs());
+        assert_str_eq!("1", mpfr!(1).abs());
+        assert_str_eq!("1", mpfr!(-1).abs());
+        assert_str_eq!("NaN", mpfr_nan!().abs());
+        assert_str_eq!("inf", mpfr_inf!().abs());
+        assert_str_eq!("inf", mpfr_neg_inf!().abs());
+    }
 
     #[test]
     fn test_constants() {
@@ -206,60 +338,45 @@ mod test {
     }
 
     #[test]
-    fn test_from_f64() {
-        assert_str_eq!("1", Mpfr::custom_from_f64(1.1, 2, RoundingMode::HalfToEven));
-        assert_str_eq!("2", Mpfr::custom_from_f64(2.5, 2, RoundingMode::HalfToEven));
-        assert_str_eq!("4", Mpfr::custom_from_f64(3.5, 2, RoundingMode::HalfToEven));
-        assert_str_eq!("-2", Mpfr::custom_from_f64(-2.5, 2, RoundingMode::HalfToEven));
-        assert_str_eq!("-4", Mpfr::custom_from_f64(-3.5, 2, RoundingMode::HalfToEven));
+    fn test_queries() {
+        assert!(mpfr!(0).is_finite());
+        assert!(!mpfr!(0).is_infinite());
+        assert!(!mpfr!(0).is_infinity());
+        assert!(!mpfr!(0).is_neg_infinity());
+        assert!(!mpfr!(0).is_nan());
 
-        assert_str_eq!("1.5", Mpfr::custom_from_f64(1.1, 2, RoundingMode::HalfAwayFromZero));
-        assert_str_eq!("3", Mpfr::custom_from_f64(2.5, 2, RoundingMode::HalfAwayFromZero));
-        assert_str_eq!("4", Mpfr::custom_from_f64(3.5, 2, RoundingMode::HalfAwayFromZero));
-        assert_str_eq!("-3", Mpfr::custom_from_f64(-2.5, 2, RoundingMode::HalfAwayFromZero));
-        assert_str_eq!("-4", Mpfr::custom_from_f64(-3.5, 2, RoundingMode::HalfAwayFromZero));
+        assert!(!mpfr_inf!().is_finite());
+        assert!(mpfr_inf!().is_infinite());
+        assert!(mpfr_inf!().is_infinity());
+        assert!(!mpfr_inf!().is_neg_infinity());
+        assert!(!mpfr_inf!().is_nan());
 
-        assert_str_eq!("1", Mpfr::custom_from_f64(1.1, 2, RoundingMode::Down));
-        assert_str_eq!("2", Mpfr::custom_from_f64(2.5, 2, RoundingMode::Down));
-        assert_str_eq!("3", Mpfr::custom_from_f64(3.5, 2, RoundingMode::Down));
-        assert_str_eq!("-3", Mpfr::custom_from_f64(-2.5, 2, RoundingMode::Down));
-        assert_str_eq!("-4", Mpfr::custom_from_f64(-3.5, 2, RoundingMode::Down));
+        assert!(!mpfr_neg_inf!().is_finite());
+        assert!(mpfr_neg_inf!().is_infinite());
+        assert!(!mpfr_neg_inf!().is_infinity());
+        assert!(mpfr_neg_inf!().is_neg_infinity());
+        assert!(!mpfr_neg_inf!().is_nan());
 
-        assert_str_eq!("1.5", Mpfr::custom_from_f64(1.1, 2, RoundingMode::Up));
-        assert_str_eq!("3", Mpfr::custom_from_f64(2.5, 2, RoundingMode::Up));
-        assert_str_eq!("4", Mpfr::custom_from_f64(3.5, 2, RoundingMode::Up));
-        assert_str_eq!("-2", Mpfr::custom_from_f64(-2.5, 2, RoundingMode::Up));
-        assert_str_eq!("-3", Mpfr::custom_from_f64(-3.5, 2, RoundingMode::Up));
-
-        assert_str_eq!("1", Mpfr::custom_from_f64(1.1, 2, RoundingMode::TowardsZero));
-        assert_str_eq!("2", Mpfr::custom_from_f64(2.5, 2, RoundingMode::TowardsZero));
-        assert_str_eq!("3", Mpfr::custom_from_f64(3.5, 2, RoundingMode::TowardsZero));
-        assert_str_eq!("-2", Mpfr::custom_from_f64(-2.5, 2, RoundingMode::TowardsZero));
-        assert_str_eq!("-3", Mpfr::custom_from_f64(-3.5, 2, RoundingMode::TowardsZero));
-
-        assert_str_eq!("1.5", Mpfr::custom_from_f64(1.1, 2, RoundingMode::AwayFromZero));
-        assert_str_eq!("3", Mpfr::custom_from_f64(2.5, 2, RoundingMode::AwayFromZero));
-        assert_str_eq!("4", Mpfr::custom_from_f64(3.5, 2, RoundingMode::AwayFromZero));
-        assert_str_eq!("-3", Mpfr::custom_from_f64(-2.5, 2, RoundingMode::AwayFromZero));
-        assert_str_eq!("-4", Mpfr::custom_from_f64(-3.5, 2, RoundingMode::AwayFromZero));
+        assert!(!mpfr_nan!().is_finite());
+        assert!(!mpfr_nan!().is_infinite());
+        assert!(!mpfr_nan!().is_infinity());
+        assert!(!mpfr_nan!().is_neg_infinity());
+        assert!(mpfr_nan!().is_nan());
     }
 
     #[test]
-    fn test_from_str() {
-        assert_str_eq!("1", Mpfr::custom_from_str("1.1", 10, 2, RoundingMode::HalfToEven).unwrap());
-        assert_str_eq!("inf", Mpfr::custom_from_str("inf", 10, 2, RoundingMode::HalfToEven).unwrap());
-        assert_str_eq!("-inf", Mpfr::custom_from_str("-inf", 10, 2, RoundingMode::HalfToEven).unwrap());
-        assert_str_eq!("NaN", Mpfr::custom_from_str("NaN", 10, 2, RoundingMode::HalfToEven).unwrap());
-        assert_str_eq!("1.5", Mpfr::custom_from_str("1.1", 2, 2, RoundingMode::HalfToEven).unwrap());
-        assert!(Mpfr::custom_from_str("1\0.1", 10, 2, RoundingMode::HalfToEven).is_none());
+    fn test_sign() {
+        assert_eq!(Sign::Zero, mpfr!(0).sign());
+        assert_eq!(Sign::Positive, mpfr!(1).sign());
+        assert_eq!(Sign::Negative, mpfr!(-1).sign());
+        assert_eq!(Sign::Zero, mpfr_nan!().sign());
+        assert_eq!(Sign::Positive, mpfr_inf!().sign());
+        assert_eq!(Sign::Negative, mpfr_neg_inf!().sign());
     }
 
     #[test]
-    fn test_to_f64() {
-        assert_eq!(0.0, mpfr!(0).to_f64(RoundingMode::HalfToEven));
-        assert_eq!(1.0, mpfr!(1).to_f64(RoundingMode::HalfToEven));
-        assert_eq!(f64::INFINITY, mpfr_inf!().to_f64(RoundingMode::HalfToEven));
-        assert_eq!(f64::NEG_INFINITY, mpfr_neg_inf!().to_f64(RoundingMode::HalfToEven));
-        assert!(mpfr_nan!().to_f64(RoundingMode::HalfToEven).is_nan());
+    fn test_precision() {
+        assert_eq!(2usize, Mpfr::new(2).precision());
+        assert_eq!(53usize, mpfr!(0).precision());
     }
 }
