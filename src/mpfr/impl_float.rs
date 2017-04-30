@@ -311,7 +311,7 @@ mod test {
     }
 
     #[test]
-    fn test_into_fp_f64_lo() {
+    fn test_into_f64_lo() {
         use fp::Into;
         use std::f64;
         assert_eq!(0.0, Mpfr::into_lo(mpfr!(0)));
@@ -323,7 +323,7 @@ mod test {
     }
 
     #[test]
-    fn test_into_fp_f64_hi() {
+    fn test_into_f64_hi() {
         use fp::Into;
         use std::f64;
         assert_eq!(0.0, Mpfr::into_hi(mpfr!(0)));
