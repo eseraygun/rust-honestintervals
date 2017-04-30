@@ -1,20 +1,33 @@
+use super::capi::*;
 use super::def::Mpfr;
 
-use fp;
-use fp::{RoundingMode};
 use transc::Transc;
+
+impl Mpfr {
+    #[inline]
+    fn log_custom(mut self, rounding_mode: MpfrRnd) -> Self {
+        unsafe { mpfr_log(&mut self.mpfr, &self.mpfr, rounding_mode); }
+        self
+    }
+
+    #[inline]
+    fn exp_custom(mut self, rounding_mode: MpfrRnd) -> Self {
+        unsafe { mpfr_exp(&mut self.mpfr, &self.mpfr, rounding_mode); }
+        self
+    }
+}
 
 impl Transc for Mpfr {
     type Output = Mpfr;
 
     #[inline]
     fn log(self) -> Self::Output {
-        fp::Transc::log(self, RoundingMode::HalfToEven)
+        self.log_custom(MpfrRnd::HalfToEven)
     }
 
     #[inline]
     fn exp(self) -> Self::Output {
-        fp::Transc::exp(self, RoundingMode::HalfToEven)
+        self.exp_custom(MpfrRnd::HalfToEven)
     }
 }
 
@@ -36,8 +49,7 @@ impl Transc for Mpfr {
 mod test {
     use super::super::def::Mpfr;
 
-    use fp;
-    use fp::{Float, RoundingMode};
+    use fp::Float;
     use transc::Transc;
 
     #[test]

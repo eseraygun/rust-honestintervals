@@ -3,22 +3,6 @@ use std::convert;
 use std::ops;
 use std::str;
 
-#[derive(Clone, Copy)]
-pub enum RoundingMode {
-    /// Round to nearest with ties to even.
-    HalfToEven,
-    /// Round to nearest with ties away from zero.
-    HalfAwayFromZero,
-    /// Round towards positive infinity.
-    Up,
-    /// Round towards negative infinity.
-    Down,
-    /// Round towards zero.
-    TowardsZero,
-    /// Round away from zero.
-    AwayFromZero,
-}
-
 #[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
 pub enum Sign {
     Negative = -1,
@@ -27,16 +11,19 @@ pub enum Sign {
 }
 
 pub trait From<T> {
-    fn from(T, precision: usize, rounding_mode: RoundingMode) -> Self;
+    fn from_lo(T, precision: usize) -> Self;
+    fn from_hi(T, precision: usize) -> Self;
 }
 
 pub trait FromStr: Sized {
     type Err;
-    fn from_str(&str, precision: usize, rounding_mode: RoundingMode) -> Result<Self, Self::Err>;
+    fn from_str_lo(&str, precision: usize) -> Result<Self, Self::Err>;
+    fn from_str_hi(&str, precision: usize) -> Result<Self, Self::Err>;
 }
 
 pub trait Into<T> {
-    fn into(self, rounding_mode: RoundingMode) -> T;
+    fn into_lo(self) -> T;
+    fn into_hi(self) -> T;
 }
 
 pub trait MinMax<RHS = Self> {
@@ -52,28 +39,34 @@ pub trait Abs {
 
 pub trait Add<RHS = Self> {
     type Output;
-    fn add(self, rhs: RHS, rounding_mode: RoundingMode) -> Self::Output;
+    fn add_lo(self, rhs: RHS) -> Self::Output;
+    fn add_hi(self, rhs: RHS) -> Self::Output;
 }
 
 pub trait Sub<RHS = Self> {
     type Output;
-    fn sub(self, rhs: RHS, rounding_mode: RoundingMode) -> Self::Output;
+    fn sub_lo(self, rhs: RHS) -> Self::Output;
+    fn sub_hi(self, rhs: RHS) -> Self::Output;
 }
 
 pub trait Mul<RHS = Self> {
     type Output;
-    fn mul(self, rhs: RHS, rounding_mode: RoundingMode) -> Self::Output;
+    fn mul_lo(self, rhs: RHS) -> Self::Output;
+    fn mul_hi(self, rhs: RHS) -> Self::Output;
 }
 
 pub trait Div<RHS = Self> {
     type Output;
-    fn div(self, rhs: RHS, rounding_mode: RoundingMode) -> Self::Output;
+    fn div_lo(self, rhs: RHS) -> Self::Output;
+    fn div_hi(self, rhs: RHS) -> Self::Output;
 }
 
 pub trait Transc {
     type Output;
-    fn log(self, rounding_mode: RoundingMode) -> Self::Output;
-    fn exp(self, rounding_mode: RoundingMode) -> Self::Output;
+    fn log_lo(self) -> Self::Output;
+    fn log_hi(self) -> Self::Output;
+    fn exp_lo(self) -> Self::Output;
+    fn exp_hi(self) -> Self::Output;
 }
 
 pub trait Float: convert::From<f64> + str::FromStr +

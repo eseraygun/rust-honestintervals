@@ -1,5 +1,5 @@
 macro_rules! mpfr {
-    ($v:expr) => { <Mpfr as fp::From<f64>>::from($v.into(), 53, RoundingMode::HalfToEven) }
+    ($v:expr) => { Mpfr::from($v as f64) }
 }
 
 macro_rules! mpfr_inf {
