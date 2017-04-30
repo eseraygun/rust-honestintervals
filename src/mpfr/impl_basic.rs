@@ -31,7 +31,7 @@ impl Mpfr {
     }
 
     #[inline]
-    pub fn set_pos_zero(mut self) -> Self {
+    pub fn set_zero(mut self) -> Self {
         unsafe { mpfr_set_zero(&mut self.mpfr, 1) };
         self
     }

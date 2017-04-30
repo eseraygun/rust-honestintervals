@@ -10,7 +10,12 @@ use std::mem::uninitialized;
 impl Float for Mpfr {
     #[inline]
     fn zero(precision: usize) -> Self {
-        Self::new(precision).set_pos_zero()
+        Self::new(precision).set_zero()
+    }
+
+    #[inline]
+    fn neg_zero(precision: usize) -> Self {
+        Self::new(precision).set_neg_zero()
     }
 
     #[inline]
@@ -190,6 +195,9 @@ mod test {
     #[test]
     fn test_constants() {
         assert_str_eq!("0", Mpfr::zero(53));
+        assert!((Mpfr::one(53) / Mpfr::zero(53)).is_infinity());
+        assert_str_eq!("0", Mpfr::neg_zero(53));
+        assert!((Mpfr::one(53) / Mpfr::neg_zero(53)).is_neg_infinity());
         assert_eq!(53, Mpfr::zero(53).precision());
         assert_str_eq!("1", Mpfr::one(53));
         assert_str_eq!("inf", Mpfr::infinity(53));

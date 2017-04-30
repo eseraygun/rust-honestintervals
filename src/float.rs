@@ -27,6 +27,7 @@ pub enum Sign {
 pub trait Float : From<f64> + FromStr + Clone + Display + Into<f64> + PartialOrd
 {
     fn zero(precision: usize) -> Self;
+    fn neg_zero(precision: usize) -> Self;
     fn one(precision: usize) -> Self;
     fn infinity(precision: usize) -> Self;
     fn neg_infinity(precision: usize) -> Self;
