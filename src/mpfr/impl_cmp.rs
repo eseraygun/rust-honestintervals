@@ -58,6 +58,8 @@ mod test {
 
     use float::{Float, RoundingMode};
 
+    use std::cmp::Ordering;
+
     #[test]
     fn test_partial_eq() {
         assert!(mpfr!(0) == mpfr!(0));
@@ -69,7 +71,19 @@ mod test {
     }
 
     #[test]
-    fn test_partial_ord() {
+    fn test_partial_ord_cmp() {
+        assert_eq!(Ordering::Equal, mpfr!(0).partial_cmp(&mpfr!(0)).unwrap());
+        assert_eq!(Ordering::Less, mpfr!(0).partial_cmp(&mpfr!(1)).unwrap());
+        assert_eq!(Ordering::Greater, mpfr!(1).partial_cmp(&mpfr!(0)).unwrap());
+        assert_eq!(Ordering::Equal, mpfr_neg_inf!().partial_cmp(&mpfr_neg_inf!()).unwrap());
+        assert_eq!(Ordering::Equal, mpfr_inf!().partial_cmp(&mpfr_inf!()).unwrap());
+        assert_eq!(Ordering::Less, mpfr_neg_inf!().partial_cmp(&mpfr_inf!()).unwrap());
+        assert_eq!(Ordering::Greater, mpfr_inf!().partial_cmp(&mpfr_neg_inf!()).unwrap());
+        assert!(mpfr_nan!().partial_cmp(&mpfr_nan!()).is_none());
+    }
+
+    #[test]
+    fn test_partial_ord_rest() {
         assert!(mpfr!(0) <= mpfr!(0));
         assert!(mpfr!(0) >= mpfr!(0));
         assert!(mpfr!(0) < mpfr!(1));
