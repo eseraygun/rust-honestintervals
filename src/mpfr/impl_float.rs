@@ -212,7 +212,7 @@ impl Float for Mpfr {
 
     #[inline]
     fn nan(precision: usize) -> Self {
-        Self::new(precision).set_nan()
+        Self::new(precision)
     }
 
     #[inline]

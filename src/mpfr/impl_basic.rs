@@ -58,6 +58,15 @@ impl Mpfr {
         unsafe { mpfr_set_d(&mut self.mpfr, val, rounding_mode) };
         self
     }
+
+    #[inline]
+    pub fn set_str(mut self, c: CString, rounding_mode: MpfrRnd) -> Option<Self> {
+        if unsafe { mpfr_set_str(&mut self.mpfr, c.as_ptr(), 10, rounding_mode) } == 0 {
+            Some(self)
+        } else {
+            None
+        }
+    }
 }
 
 impl Drop for Mpfr {
@@ -82,15 +91,13 @@ impl From<f64> for Mpfr {
 }
 
 impl Mpfr {
-    pub fn from_str_custom(s: &str, precision: usize, rounding_mode: MpfrRnd) -> Result<Self, ParseMpfrError> {
-        if let Ok(c_val) = CString::new(s) {
-            let mut mpfr = unsafe { uninitialized() };
-            unsafe { mpfr_init2(&mut mpfr, precision as MpfrPrec); }
-            let ret = unsafe {
-                mpfr_set_str(&mut mpfr, c_val.as_ptr(), 10, rounding_mode)
-            };
-            if ret == 0 {
-                Ok(Mpfr { mpfr: mpfr })
+    pub fn from_str_custom(s: &str,
+                           precision: usize,
+                           rounding_mode: MpfrRnd)
+                           -> Result<Self, ParseMpfrError> {
+        if let Ok(c) = CString::new(s) {
+            if let Some(res) = Mpfr::new(precision).set_str(c, rounding_mode) {
+                Ok(res)
             } else {
                 Err(ParseMpfrError::MpfrError)
             }

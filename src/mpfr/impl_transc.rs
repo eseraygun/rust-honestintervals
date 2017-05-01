@@ -31,20 +31,6 @@ impl Transc for Mpfr {
     }
 }
 
-//impl<'a> Transc for &'a Mpfr {
-//    type Output = Mpfr;
-//
-//    #[inline]
-//    fn log(self) -> Self::Output {
-//        Float::log(self, RoundingMode::HalfToEven)
-//    }
-//
-//    #[inline]
-//    fn exp(self) -> Self::Output {
-//        Float::exp(self, RoundingMode::HalfToEven)
-//    }
-//}
-
 #[cfg(test)]
 mod test {
     use super::super::def::Mpfr;
