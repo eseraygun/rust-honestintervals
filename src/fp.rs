@@ -72,7 +72,9 @@ pub trait Transc {
 pub trait Float: convert::From<f64> + str::FromStr +
                  Clone + Display + Into<f64> + PartialOrd +
                  From<f64> + FromStr +
-                 ops::Neg + Abs + Add + Sub + Mul + Div + MinMax
+                 ops::Neg<Output=Self> + Abs<Output=Self> +
+                 Add<Output=Self> + Sub<Output=Self> + Mul<Output=Self> + Div<Output=Self> +
+                 MinMax<Output=Self>
 {
     fn zero(precision: usize) -> Self;
     fn neg_zero(precision: usize) -> Self;
