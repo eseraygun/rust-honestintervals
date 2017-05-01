@@ -124,7 +124,7 @@ impl<BOUND: Float> Div<Self> for Interval<BOUND> {
                     )
                 },
             },
-            SignClass::Zero => if rhs.is_zero() {
+            SignClass::Zero => if rhs.is_zero() || rhs.is_nan() {
                 Self::nan(self.precision())
             } else {
                 self

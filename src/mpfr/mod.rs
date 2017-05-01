@@ -8,4 +8,8 @@ mod impl_ops;
 mod impl_transc;
 mod impl_float;
 
-pub use self::def::Mpfr;
+#[cfg(test)]
+mod tests;
+
+pub use self::capi::MpfrRnd;
+pub use self::def::{Mpfr, ParseMpfrError};

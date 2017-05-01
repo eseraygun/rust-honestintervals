@@ -26,7 +26,7 @@ macro_rules! iv_fn {
 fn test_new() {
     assert_str_eq!("<0, 1>", IV::new(b!("0"), b!("1")));
     assert_str_eq!("<-1, 0>", IV::new(b!("-1"), b!("0")));
-    assert_str_eq!("<-1, -1>", IV::new(b!("-1"), b!("-1")));
+    assert_str_eq!("-1", IV::new(b!("-1"), b!("-1")));
     assert_str_eq!("NaN", IV::new(b!("NaN"), b!("NaN")));
     assert_str_eq!("<-inf, inf>", IV::new(b!("-inf"), b!("inf")));
 }
@@ -69,7 +69,7 @@ fn test_new_neg_inf() {
 
 #[test]
 fn test_singleton() {
-    assert_str_eq!("<-1, -1>", IV::singleton(b!("-1")));
+    assert_str_eq!("-1", IV::singleton(b!("-1")));
     assert_str_eq!("NaN", IV::singleton(b!("NaN")));
 }
 
@@ -205,7 +205,6 @@ fn test_split() {
 
 #[test]
 fn test_partial_eq() {
-    use std::ops::Add;
     test_binary_op(|x, y| x == y, simple(), vec![
         ("nan.*", "false"),
         ("whl.whl", "true"),

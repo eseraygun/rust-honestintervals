@@ -1,6 +1,6 @@
 use super::capi::MpfrStruct;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum ParseMpfrError {
     CStringError,
     MpfrError,
