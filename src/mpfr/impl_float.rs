@@ -9,12 +9,12 @@ use std::ops::Neg;
 impl fp::From<f64> for Mpfr {
     #[inline]
     fn from_lo(val: f64, precision: usize) -> Self {
-        Self::new(precision).set_f64(val, MpfrRnd::Down)
+        unsafe { Self::uninitialized(precision) }.set_f64(val, MpfrRnd::Down)
     }
 
     #[inline]
     fn from_hi(val: f64, precision: usize) -> Self {
-        Self::new(precision).set_f64(val, MpfrRnd::Up)
+        unsafe { Self::uninitialized(precision) }.set_f64(val, MpfrRnd::Up)
     }
 }
 
@@ -187,32 +187,32 @@ impl fp::Transc for Mpfr {
 impl Float for Mpfr {
     #[inline]
     fn zero(precision: usize) -> Self {
-        Self::new(precision).set_zero()
+        unsafe { Self::uninitialized(precision) }.set_zero()
     }
 
     #[inline]
     fn neg_zero(precision: usize) -> Self {
-        Self::new(precision).set_neg_zero()
+        unsafe { Self::uninitialized(precision) }.set_neg_zero()
     }
 
     #[inline]
     fn one(precision: usize) -> Self {
-        Self::new(precision).set_f64(1.0, MpfrRnd::HalfToEven)
+        unsafe { Self::uninitialized(precision) }.set_f64(1.0, MpfrRnd::HalfToEven)
     }
 
     #[inline]
     fn infinity(precision: usize) -> Self {
-        Self::new(precision).set_pos_infinity()
+        unsafe { Self::uninitialized(precision) }.set_infinity()
     }
 
     #[inline]
     fn neg_infinity(precision: usize) -> Self {
-        Self::new(precision).set_neg_infinity()
+        unsafe { Self::uninitialized(precision) }.set_neg_infinity()
     }
 
     #[inline]
     fn nan(precision: usize) -> Self {
-        Self::new(precision)
+        unsafe { Self::uninitialized(precision) }  // MPFR actually initializes new values as NaN
     }
 
     #[inline]
@@ -434,7 +434,7 @@ mod test {
 
     #[test]
     fn test_precision() {
-        assert_eq!(2usize, Mpfr::new(2).precision());
+        assert_eq!(2usize, unsafe { Mpfr::uninitialized(2) }.precision());
         assert_eq!(53usize, mpfr!(0).precision());
     }
 }

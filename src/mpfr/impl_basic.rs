@@ -11,9 +11,9 @@ use std::str::FromStr;
 
 impl Mpfr {
     #[inline]
-    pub fn new(precision: usize) -> Self {
-        let mut mpfr = unsafe { uninitialized() };
-        unsafe { mpfr_init2(&mut mpfr, precision as MpfrPrec) };
+    pub unsafe fn uninitialized(precision: usize) -> Self {
+        let mut mpfr = uninitialized();
+        mpfr_init2(&mut mpfr, precision as MpfrPrec);
         Self { mpfr: mpfr }
     }
 
@@ -30,7 +30,7 @@ impl Mpfr {
     }
 
     #[inline]
-    pub fn set_pos_infinity(mut self) -> Self {
+    pub fn set_infinity(mut self) -> Self {
         unsafe { mpfr_set_inf(&mut self.mpfr, 1) };
         self
     }
@@ -79,7 +79,7 @@ impl Drop for Mpfr {
 impl Mpfr {
     #[inline]
     fn from_custom(val: f64, precision: usize, rounding_mode: MpfrRnd) -> Self {
-        Self::new(precision).set_f64(val, rounding_mode)
+        unsafe { Self::uninitialized(precision) }.set_f64(val, rounding_mode)
     }
 }
 
@@ -96,7 +96,7 @@ impl Mpfr {
                            rounding_mode: MpfrRnd)
                            -> Result<Self, ParseMpfrError> {
         if let Ok(c) = CString::new(s) {
-            if let Some(res) = Mpfr::new(precision).set_str(c, rounding_mode) {
+            if let Some(res) = unsafe { Mpfr::uninitialized(precision) }.set_str(c, rounding_mode) {
                 Ok(res)
             } else {
                 Err(ParseMpfrError::MpfrError)
@@ -118,7 +118,7 @@ impl FromStr for Mpfr {
 impl Clone for Mpfr {
     #[inline]
     fn clone(&self) -> Self {
-        Self::new(self.precision()).set(self, MpfrRnd::HalfToEven)
+        unsafe { Self::uninitialized(self.precision()) }.set(self, MpfrRnd::HalfToEven)
     }
 
     #[inline]
