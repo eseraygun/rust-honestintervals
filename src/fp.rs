@@ -74,7 +74,7 @@ pub trait Float: convert::From<f64> + str::FromStr +
                  From<f64> + FromStr +
                  ops::Neg<Output=Self> + Abs<Output=Self> +
                  Add<Output=Self> + Sub<Output=Self> + Mul<Output=Self> + Div<Output=Self> +
-                 MinMax<Output=Self>
+                 MinMax<Output=Self> + Transc<Output=Self>
 {
     fn zero(precision: usize) -> Self;
     fn neg_zero(precision: usize) -> Self;
