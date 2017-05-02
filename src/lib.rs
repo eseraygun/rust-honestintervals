@@ -1,6 +1,6 @@
 #![deny(missing_docs)]
 
-//! HonestIntervals is an interval arithmetic library with correct rounding.
+//! Honest Intervals is an interval arithmetic library with correct rounding.
 //!
 //! It implements elementary arithmetic (addition, subtraction, multiplication and division) as well
 //! as complicated mathematical functions such as logarithm and power over intervals and interval
@@ -11,7 +11,7 @@
 //! struct that wraps the GNU MPFR library. The `Mpfr` struct is an ideal (and currently only)
 //! bound type for intervals.
 //!
-//! HonestIntervals tries to be a pragmatic implementation of interval arithmetic rather than an
+//! Honest Intervals tries to be a pragmatic implementation of interval arithmetic rather than an
 //! abstract basis for all possible implementations. Users do not have to implement any traits; they
 //! can create an arbitrary precision, correctly rounding interval right away by calling
 //! `IntervalSet::<Mpfr>::new()`.
@@ -47,3 +47,17 @@ pub mod intervalset;
 
 pub use interval::{Interval, ParseIntervalError, SignClass};
 pub use intervalset::{IntervalSet, ParseIntervalSetError};
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_quick_start() {
+        use intervalset::IntervalSet;
+        use mpfr::Mpfr;
+        use std::str::FromStr;
+
+        let x = IntervalSet::<Mpfr>::from_str("{0; <1, 2>}").unwrap();
+        let y = IntervalSet::<Mpfr>::singleton(Mpfr::from(3.0));
+        assert_eq!("{3; <4, 5>}", format!("{}", x + y));
+    }
+}
