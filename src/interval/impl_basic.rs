@@ -187,12 +187,12 @@ impl<BOUND: Float> FromStr for Interval<BOUND> {
 impl<BOUND: Float> Display for Interval<BOUND> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         if self.is_singleton() || self.is_nan() {
-            self.lo.fmt(f)
+            Display::fmt(&self.lo, f)
         } else {
             if let Err(e) = f.write_char('<') { return Err(e) }
-            if let Err(e) = self.lo.fmt(f) { return Err(e) }
+            if let Err(e) = Display::fmt(&self.lo, f) { return Err(e) }
             if let Err(e) = f.write_str(", ") { return Err(e) }
-            if let Err(e) = self.hi.fmt(f) { return Err(e) }
+            if let Err(e) = Display::fmt(&self.hi, f) { return Err(e) }
             f.write_char('>')
         }
     }

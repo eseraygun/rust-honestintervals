@@ -11,7 +11,7 @@ use std::str::FromStr;
 impl<BOUND: Float> IntervalSet<BOUND> {
     #[inline]
     pub fn new(lo: BOUND, hi: BOUND) -> Self {
-        Self { intervals: vec![Interval::new(lo, hi)] }
+        Self::from_interval(Interval::new(lo, hi))
     }
 
     #[inline]
@@ -89,10 +89,11 @@ impl<BOUND: Float> IntervalSet<BOUND> {
             let s = s.trim_left_matches('{').trim_left();
             if !s.ends_with('}') { return Err(ParseIntervalSetError::MissingClosingBraces) }
             let s = s.trim_right_matches('}').trim_right();
-            let mut intervals = s.split(';').map(|v| Interval::from_str_with_prec(v, precision))
+            if s.is_empty() { return Ok(Self::empty()) }
+            let mut intervals = s.split(';').map(|v| Interval::from_str_with_prec(v.trim(), precision))
                 .collect::<Vec<Result<Interval<BOUND>, ParseIntervalError>>>();
             if intervals.iter().all(|i| i.is_ok()) {
-                Ok(IntervalSet::from_intervals(intervals.drain(..).map(|i| i.unwrap()).collect()))
+                Ok(Self::from_intervals(intervals.drain(..).map(|i| i.unwrap()).collect()))
             } else {
                 Err(ParseIntervalSetError::IntervalsParseError)
             }
@@ -154,14 +155,14 @@ impl<BOUND: Float> Display for IntervalSet<BOUND> {
         if self.intervals.is_empty() {
             f.write_str("{}")
         } else if self.intervals.len() == 1 {
-            self.intervals[0].fmt(f)
+            Display::fmt(&self.intervals[0], f)
         } else {
             if let Err(e) = f.write_char('{') { return Err(e) }
             let mut iter = self.intervals.iter();
-            if let Err(e) = iter.next().unwrap().fmt(f) { return Err(e) }
+            if let Err(e) = Display::fmt(&iter.next().unwrap(), f) { return Err(e) }
             for i in iter {
                 if let Err(e) = f.write_str("; ") { return Err(e) }
-                if let Err(e) = i.fmt(f) { return Err(e) }
+                if let Err(e) = Display::fmt(&i, f) { return Err(e) }
             }
             f.write_char('}')
         }

@@ -29,14 +29,32 @@ macro_rules! ivs {
 #[test]
 fn test_new() {
     assert_str_eq!("<0, 1>", IVS::new(b!("0"), b!("1")));
+    assert_str_eq!("<-1, 0>", IVS::new(b!("-1"), b!("0")));
+    assert_str_eq!("-1", IVS::new(b!("-1"), b!("-1")));
+    assert_str_eq!("{}", IVS::new(b!("NaN"), b!("NaN")));
+    assert_str_eq!("<-inf, inf>", IVS::new(b!("-inf"), b!("inf")));
+}
+
+#[test]
+fn test_singleton() {
+    assert_str_eq!("-1", IVS::singleton(b!("-1")));
+    assert_str_eq!("{}", IVS::singleton(b!("NaN")));
 }
 
 #[test]
 fn test_constants() {
-    assert_str_eq!("0", IVS::zero(53));
-    assert_str_eq!("1", IVS::one(53));
+    assert_str_eq!("0", IVS::zero(PREC));
+    assert_str_eq!("1", IVS::one(PREC));
     assert_str_eq!("{}", IVS::empty());
-    assert_str_eq!("<-inf, inf>", IVS::whole(53));
+    assert_str_eq!("<-inf, inf>", IVS::whole(PREC));
+}
+
+#[test]
+fn test_is_singleton() {
+    assert!(!ivs!("{}").is_singleton());
+    assert!(!ivs!("<0, 1>").is_singleton());
+    assert!(ivs!("<1, 1>").is_singleton());
+    assert!(!ivs!("{0; <1, 2>}").is_singleton());
 }
 
 #[test]
