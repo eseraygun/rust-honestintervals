@@ -13,8 +13,7 @@
 //!
 //! Honest Intervals tries to be a pragmatic implementation of interval arithmetic rather than an
 //! abstract basis for all possible implementations. Users do not have to implement any traits; they
-//! can create an arbitrary precision, correctly rounding interval right away by calling
-//! `IntervalSet::<Mpfr>::new()`.
+//! can create a correctly rounding interval right away by calling `IntervalSet::<Mpfr>::new()`.
 
 extern crate libc;
 

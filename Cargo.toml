@@ -2,6 +2,14 @@
 name = "honestintervals"
 version = "0.1.0"
 authors = ["eser"]
+description = "Comprehensive, correctly rounding interval arithmetic library."
+documentation = "https://docs.rs/honestintervals/"
+repository = "https://github.com/eseraygun/rust-honestintervals/"
+readme = "README.md"
+keywords = ["interval-arithmetic", "correct-rounding", "arbitrary-precision", "mpfr"]
+categories = ["algorithms", "api-bindings", "data-structures", "science"]
+license = "Apache-2.0"
+license-file = "LICENSE"
 
 [dependencies]
 libc = "*"
