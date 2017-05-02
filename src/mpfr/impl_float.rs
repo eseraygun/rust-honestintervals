@@ -243,6 +243,11 @@ impl Float for Mpfr {
     }
 
     #[inline]
+    fn is_zero(&self) -> bool {
+        unsafe { mpfr_zero_p(&self.mpfr) != 0 }
+    }
+
+    #[inline]
     fn is_infinity(&self) -> bool {
         unsafe { mpfr_inf_p(&self.mpfr) != 0 && mpfr_sgn(&self.mpfr) > 0 }
     }

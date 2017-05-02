@@ -6,6 +6,22 @@ use std::fmt;
 use std::fmt::{Display, Formatter, Write};
 use std::str::FromStr;
 
+impl SignClass {
+    pub fn is_positive(&self) -> bool {
+        match *self {
+            SignClass::Positive(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_negative(&self) -> bool {
+        match *self {
+            SignClass::Negative(_) => true,
+            _ => false,
+        }
+    }
+}
+
 impl Display for SignClass {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         match *self {
@@ -28,10 +44,27 @@ impl Display for SignClass {
 impl<BOUND: Float> Interval<BOUND> {
     #[inline]
     pub fn new(lo: BOUND, hi: BOUND) -> Self {
-        assert_eq!(lo.precision(), hi.precision());
-        assert!(!lo.is_nan() && !hi.is_nan() && lo <= hi || lo.is_nan() && hi.is_nan());
-        assert!(!(lo.is_infinity() && hi.is_infinity()) && !(lo.is_neg_infinity() && hi.is_neg_infinity()));
+        assert_eq!(lo.precision(), hi.precision(),
+                   "inconsistent precision: {} != {}", lo.precision(), hi.precision());
+        assert!(!lo.is_nan() && !hi.is_nan() && lo <= hi || lo.is_nan() && hi.is_nan(),
+                "invalid bounds: <{}, {}>", lo, hi);
+        assert!(!(lo.is_infinity() && hi.is_infinity()) && !(lo.is_neg_infinity() && hi.is_neg_infinity()),
+                "invalid bounds: <{}, {}>", lo, hi);
         Interval { lo: lo, hi: hi }
+    }
+
+    pub fn minimal_cover(mut intervals: Vec<Self>, precision: usize) -> Self {
+        intervals.retain(|i| !i.is_nan());
+        if intervals.is_empty() {
+            return Self::nan(precision)
+        }
+        let lo = intervals.iter()
+            .map(|i| i.lo.clone())
+            .fold(BOUND::infinity(precision), |x, y| x.min(y));
+        let hi = intervals.iter()
+            .map(|i| i.hi.clone())
+            .fold(BOUND::neg_infinity(precision), |x, y| x.max(y));
+        Self { lo: lo, hi: hi }
     }
 
     #[inline]

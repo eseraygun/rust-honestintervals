@@ -88,6 +88,7 @@ pub trait Float: convert::From<f64> + str::FromStr +
 
     fn is_finite(&self) -> bool;
     fn is_infinite(&self) -> bool;
+    fn is_zero(&self) -> bool;
     fn is_infinity(&self) -> bool;
     fn is_neg_infinity(&self) -> bool;
     fn is_nan(&self) -> bool;

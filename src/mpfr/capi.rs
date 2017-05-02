@@ -49,6 +49,7 @@ extern "C" {
     pub fn mpfr_nan_p(op: MpfrConstPtr) -> c_int;
     pub fn mpfr_inf_p(op: MpfrConstPtr) -> c_int;
     pub fn mpfr_number_p(op: MpfrConstPtr) -> c_int;
+    pub fn mpfr_zero_p(op: MpfrConstPtr) -> c_int;
     pub fn mpfr_sgn(op: MpfrConstPtr) -> c_int;
     pub fn mpfr_greater_p(op1: MpfrConstPtr, op2: MpfrConstPtr) -> c_int;
     pub fn mpfr_greaterequal_p(op1: MpfrConstPtr, op2: MpfrConstPtr) -> c_int;

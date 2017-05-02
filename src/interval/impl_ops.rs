@@ -98,93 +98,123 @@ impl<BOUND: Float> Mul<Self> for Interval<BOUND> {
     }
 }
 
+impl<BOUND: Float> Interval<BOUND> {
+    pub fn div_multi(self, rhs: Self) -> Vec<Self> {
+        let precision = self.precision();
+        match self.sign_class() {
+            SignClass::Mixed => match rhs.sign_class() {
+                SignClass::Mixed => vec![Self::whole(precision)],
+                SignClass::Zero => vec![],
+                SignClass::Positive(other_has_zero) => if other_has_zero {
+                    vec![Self::whole(precision)]
+                } else {
+                    vec![Self::new(
+                        self.lo.div_lo(rhs.lo.clone()),
+                        self.hi.div_hi(rhs.lo),
+                    )]
+                },
+                SignClass::Negative(other_has_zero) => if other_has_zero {
+                    vec![Self::whole(precision)]
+                } else {
+                    vec![Self::new(
+                        self.hi.div_lo(rhs.hi.clone()),
+                        self.lo.div_hi(rhs.hi),
+                    )]
+                },
+            },
+            SignClass::Zero => if self.is_nan() || rhs.is_nan() || rhs.is_zero() {
+                vec![]
+            } else {
+                vec![self]
+            },
+            SignClass::Positive(self_has_zero) => match rhs.sign_class() {
+                SignClass::Mixed => if self_has_zero {
+                    vec![Self::whole(precision)]
+                } else {
+                    vec![
+                        Interval::new(
+                            BOUND::neg_infinity(precision),
+                            self.lo.clone().div_hi(rhs.lo),
+                        ),
+                        Interval::new(
+                            self.lo.div_lo(rhs.hi),
+                            BOUND::infinity(precision),
+                        ),
+                    ]
+                },
+                SignClass::Zero => vec![],
+                SignClass::Positive(other_has_zero) => if other_has_zero {
+                    vec![Self::new(
+                        self.lo.clone().div_lo(rhs.hi),
+                        BOUND::infinity(precision),
+                    )]
+                } else {
+                    vec![Self::new(
+                        self.lo.div_lo(rhs.hi),
+                        self.hi.div_hi(rhs.lo),
+                    )]
+                },
+                SignClass::Negative(other_has_zero) => if other_has_zero {
+                    vec![Self::new(
+                        BOUND::neg_infinity(precision),
+                        self.lo.div_hi(rhs.lo),
+                    )]
+                } else {
+                    vec![Self::new(
+                        self.hi.div_lo(rhs.hi),
+                        self.lo.div_hi(rhs.lo),
+                    )]
+                },
+            },
+            SignClass::Negative(self_has_zero) => match rhs.sign_class() {
+                SignClass::Mixed => if self_has_zero {
+                    vec![Self::whole(precision)]
+                } else {
+                    vec![
+                        Interval::new(
+                            BOUND::neg_infinity(precision),
+                            self.hi.clone().div_hi(rhs.hi),
+                        ),
+                        Interval::new(
+                            self.hi.div_lo(rhs.lo),
+                            BOUND::infinity(precision),
+                        ),
+                    ]
+                },
+                SignClass::Zero => vec![],
+                SignClass::Positive(other_has_zero) => if other_has_zero {
+                    vec![Self::new(
+                        BOUND::neg_infinity(precision),
+                        self.hi.div_hi(rhs.hi),
+                    )]
+                } else {
+                    vec![Self::new(
+                        self.lo.div_lo(rhs.lo),
+                        self.hi.div_hi(rhs.hi),
+                    )]
+                },
+                SignClass::Negative(other_has_zero) => if other_has_zero {
+                    vec![Self::new(
+                        self.hi.div_lo(rhs.lo),
+                        BOUND::infinity(precision),
+                    )]
+                } else {
+                    vec![Self::new(
+                        self.hi.div_lo(rhs.lo),
+                        self.lo.div_hi(rhs.hi),
+                    )]
+                },
+            },
+        }
+    }
+}
+
 impl<BOUND: Float> Div<Self> for Interval<BOUND> {
     type Output = Self;
 
     #[inline]
     fn div(self, rhs: Self) -> Self::Output {
-        match self.sign_class() {
-            SignClass::Mixed => match rhs.sign_class() {
-                SignClass::Mixed => Self::whole(self.precision()),
-                SignClass::Zero => Self::nan(self.precision()),
-                SignClass::Positive(other_has_zero) => if other_has_zero {
-                    Self::whole(self.precision())
-                } else {
-                    Self::new(
-                        self.lo.div_lo(rhs.lo.clone()),
-                        self.hi.div_hi(rhs.lo),
-                    )
-                },
-                SignClass::Negative(other_has_zero) => if other_has_zero {
-                    Self::whole(self.precision())
-                } else {
-                    Self::new(
-                        self.hi.div_lo(rhs.hi.clone()),
-                        self.lo.div_hi(rhs.hi),
-                    )
-                },
-            },
-            SignClass::Zero => if rhs.is_zero() || rhs.is_nan() {
-                Self::nan(self.precision())
-            } else {
-                self
-            },
-            SignClass::Positive(_) => match rhs.sign_class() {
-                SignClass::Mixed => Self::whole(self.precision()),
-                SignClass::Zero => Self::nan(self.precision()),
-                SignClass::Positive(other_has_zero) => if other_has_zero {
-                    let precision = self.precision();
-                    Self::new(
-                        self.lo.div_lo(rhs.hi),
-                        BOUND::infinity(precision),
-                    )
-                } else {
-                    Self::new(
-                        self.lo.div_lo(rhs.hi),
-                        self.hi.div_hi(rhs.lo),
-                    )
-                },
-                SignClass::Negative(other_has_zero) => if other_has_zero {
-                    let precision = self.precision();
-                    Self::new(
-                        BOUND::neg_infinity(precision),
-                        self.lo.div_hi(rhs.lo),
-                    )
-                } else {
-                    Self::new(
-                        self.hi.div_lo(rhs.hi),
-                        self.lo.div_hi(rhs.lo),
-                    )
-                },
-            },
-            SignClass::Negative(_) => match rhs.sign_class() {
-                SignClass::Mixed => Self::whole(self.precision()),
-                SignClass::Zero => Self::nan(self.precision()),
-                SignClass::Positive(other_has_zero) => if other_has_zero {
-                    let precision = self.precision();
-                    Self::new(
-                        BOUND::neg_infinity(precision),
-                        self.hi.div_hi(rhs.hi),
-                    )
-                } else {
-                    Self::new(
-                        self.lo.div_lo(rhs.lo),
-                        self.hi.div_hi(rhs.hi),
-                    )
-                },
-                SignClass::Negative(other_has_zero) => if other_has_zero {
-                    let precision = self.precision();
-                    Self::new(
-                        self.hi.div_lo(rhs.lo),
-                        BOUND::infinity(precision),
-                    )
-                } else {
-                    Self::new(
-                        self.hi.div_lo(rhs.lo),
-                        self.lo.div_hi(rhs.hi),
-                    )
-                },
-            },
-        }
+        let precision = self.precision();
+        Self::minimal_cover(self.div_multi(rhs), precision)
     }
 }
