@@ -25,8 +25,8 @@ can create a correctly rounding interval right away by calling `IntervalSet::<Mp
 Here is a code that creates two interval sets and adds them.
 
 ```rust
-use intervalset::IntervalSet;
-use mpfr::Mpfr;
+use honestintervals::IntervalSet;
+use honestintervals::mpfr::Mpfr;
 use std::str::FromStr;
 
 let x = IntervalSet::<Mpfr>::from_str("{0; <1, 2>}").unwrap();
