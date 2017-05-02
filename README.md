@@ -1,5 +1,10 @@
 # Honest Intervals
 
+[![Crate](https://img.shields.io/crates/v/honestintervals.svg)](https://crates.io/crates/honestintervals)
+[![Documentation](https://docs.rs/honestintervals/badge.svg)](https://docs.rs/honestintervals/)
+[![License](https://img.shields.io/crates/l/honestintervals.svg)](LICENSE)
+[![Downloads](https://img.shields.io/crates/d/honestintervals.svg)](https://crates.io/crates/honestintervals)
+
 Honest Intervals is an arbitrary precision interval arithmetic library with correct rounding.
 
 It implements elementary arithmetic (addition, subtraction, multiplication and division) as well
