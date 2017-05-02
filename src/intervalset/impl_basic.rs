@@ -96,6 +96,12 @@ impl<BOUND: Float> IntervalSet<BOUND> {
         Self::from_interval(Interval::whole(precision))
     }
 
+    /// Constructs an interval set from a float with given precision.
+    #[inline]
+    pub fn from_with_prec(val: f64, precision: usize) -> Self {
+        Self::new(BOUND::from_lo(val, precision), BOUND::from_hi(val, precision))
+    }
+
     /// Constructs an interval set by parsing a string.
     ///
     /// Accepts `INTERVAL_SET` according to the rule below.
@@ -165,7 +171,7 @@ impl<BOUND: Float> IntervalSet<BOUND> {
 impl<BOUND: Float> From<f64> for IntervalSet<BOUND> {
     #[inline]
     fn from(val: f64) -> Self {
-        Self::new(BOUND::from_lo(val, 53), BOUND::from_hi(val, 53))
+        Self::from_with_prec(val, 53)
     }
 }
 

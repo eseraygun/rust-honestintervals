@@ -107,6 +107,12 @@ impl<BOUND: Float> Interval<BOUND> {
         Self::new(BOUND::neg_infinity(precision), BOUND::infinity(precision))
     }
 
+    /// Constructs an interval from a float with given precision.
+    #[inline]
+    pub fn from_with_prec(val: f64, precision: usize) -> Self {
+        Self::new(BOUND::from_lo(val, precision), BOUND::from_hi(val, precision))
+    }
+
     /// Constructs an interval by parsing a string.
     ///
     /// Accepts `INTERVAL` according to the rule below.
@@ -238,7 +244,7 @@ impl<BOUND: Float> Interval<BOUND> {
 impl<BOUND: Float> From<f64> for Interval<BOUND> {
     #[inline]
     fn from(val: f64) -> Self {
-        Self::singleton(BOUND::from(val))
+        Self::from_with_prec(val, 53)
     }
 }
 
