@@ -9,7 +9,6 @@ readme = "README.md"
 keywords = ["interval-arithmetic", "correct-rounding", "arbitrary-precision", "mpfr"]
 categories = ["algorithms", "api-bindings", "data-structures", "science"]
 license = "Apache-2.0"
-license-file = "LICENSE"
 
 [dependencies]
 libc = "0.*"
