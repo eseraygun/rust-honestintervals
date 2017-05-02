@@ -29,6 +29,14 @@ let y = IntervalSet::<Mpfr>::singleton(Mpfr::from(3.0));
 assert_eq!("{3; <4, 5>}", format!("{}", x + y));
 ```
 
+Here is a tricky case of interval division handled correctly by Honest Intervals.
+
+```rust
+let x = IntervalSet::<Mpfr>::from_str("<1, 2>").unwrap();
+let y = IntervalSet::<Mpfr>::from_str("<-1, 1>").unwrap();
+assert_eq!("{<-inf, -1>; <1, inf>}", format!("{}", x / y));
+```
+
 See the [documentation](https://docs.rs/honestintervals/) for more details.
 
 ## License

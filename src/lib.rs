@@ -58,5 +58,9 @@ mod tests {
         let x = IntervalSet::<Mpfr>::from_str("{0; <1, 2>}").unwrap();
         let y = IntervalSet::<Mpfr>::singleton(Mpfr::from(3.0));
         assert_eq!("{3; <4, 5>}", format!("{}", x + y));
+
+        let x = IntervalSet::<Mpfr>::from_str("<1, 2>").unwrap();
+        let y = IntervalSet::<Mpfr>::from_str("<-1, 1>").unwrap();
+        assert_eq!("{<-inf, -1>; <1, inf>}", format!("{}", x / y));
     }
 }
