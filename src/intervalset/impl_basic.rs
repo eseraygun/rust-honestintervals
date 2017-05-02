@@ -9,11 +9,17 @@ use std::fmt::{Display, Formatter, Write};
 use std::str::FromStr;
 
 impl<BOUND: Float> IntervalSet<BOUND> {
+    /// Constructs an interval set of one interval from given bounds.
+    ///
+    /// The result may be empty if both bounds are NaN.
     #[inline]
     pub fn new(lo: BOUND, hi: BOUND) -> Self {
         Self::from_interval(Interval::new(lo, hi))
     }
 
+    /// Constructs an interval set of one interval from given interval.
+    ///
+    /// The result may be empty if the interval is NaN.
     #[inline]
     pub fn from_interval(i: Interval<BOUND>) -> Self {
         if i.is_nan() {
@@ -23,6 +29,9 @@ impl<BOUND: Float> IntervalSet<BOUND> {
         }
     }
 
+    /// Constructs an interval set from given intervals.
+    ///
+    /// The intervals will be sorted and the intersecting intervals will be merged.
     pub fn from_intervals(mut intervals: Vec<Interval<BOUND>>) -> Self {
         intervals.retain(|i| !i.is_nan());
         if intervals.is_empty() {
@@ -55,31 +64,43 @@ impl<BOUND: Float> IntervalSet<BOUND> {
         Self { intervals: optimized_intervals }
     }
 
+    /// Constructs an interval set of one singleton interval.
+    ///
+    /// The result may be empty if the value is NaN.
     #[inline]
     pub fn singleton(val: BOUND) -> Self {
         Self::from_interval(Interval::singleton(val))
     }
 
+    /// Constructs an interval set of one interval containing only zero.
     #[inline]
     pub fn zero(precision: usize) -> Self {
         Self::from_interval(Interval::zero(precision))
     }
 
+    /// Constructs an interval set of one interval containing only one.
     #[inline]
     pub fn one(precision: usize) -> Self {
         Self::from_interval(Interval::one(precision))
     }
 
+    /// Constructs an empty interval set.
     #[inline]
     pub fn empty() -> Self {
         Self { intervals: vec![] }
     }
 
+    /// Constructs an interval set of one interval containing all numbers.
     #[inline]
     pub fn whole(precision: usize) -> Self {
         Self::from_interval(Interval::whole(precision))
     }
 
+    /// Constructs an interval set by parsing a string.
+    ///
+    /// Accepts `INTERVAL_SET` according to the rule below.
+    ///
+    ///   INTERVAL_SET = INTERVAL | '{' ( INTERVAL ( ';' INTERVAL )* )? '}'
     #[inline]
     pub fn from_str_with_prec(s: &str, precision: usize) -> Result<Self, ParseIntervalSetError> {
         if let Ok(i) = Interval::from_str_with_prec(s, precision) {
@@ -102,33 +123,38 @@ impl<BOUND: Float> IntervalSet<BOUND> {
         }
     }
 
+    /// Whether `self` contains only one interval that is singleton.
     #[inline]
     pub fn is_singleton(&self) -> bool {
         self.intervals.len() == 1 && self.intervals[0].is_singleton()
     }
 
+    /// Whether `self` contains only one interval that contains only zero.
     #[inline]
     pub fn is_zero(&self) -> bool {
         self.intervals.len() == 1 && self.intervals[0].is_zero()
     }
 
+    /// Whether `self` is empty.
     #[inline]
     pub fn is_empty(&self) -> bool {
         self.intervals.is_empty()
     }
 
+    /// Whether `self` contains an interval that contains zero.
     #[inline]
     pub fn has_zero(&self) -> bool {
         self.intervals.iter().any(|i| i.has_zero())
     }
 
+    /// Performs a binary operation by performing it on all pairs of intervals of `self` and `rhs`.
     #[inline]
-    pub fn binary_op<OP>(self, other: Self, op: OP) -> Self
+    pub fn binary_op<OP>(self, rhs: Self, op: OP) -> Self
         where OP: Fn(Interval<BOUND>, Interval<BOUND>) -> Vec<Interval<BOUND>>
     {
         let mut intervals = Vec::<Interval<BOUND>>::new();
         for i in &self.intervals {
-            for j in &other.intervals {
+            for j in &rhs.intervals {
                 intervals.append(&mut op(i.clone(), j.clone()));
             }
         }

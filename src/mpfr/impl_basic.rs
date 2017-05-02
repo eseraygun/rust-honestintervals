@@ -10,6 +10,7 @@ use std::mem::uninitialized;
 use std::str::FromStr;
 
 impl Mpfr {
+    /// Constructs an uninitialized MPFR.
     #[inline]
     pub unsafe fn uninitialized(precision: usize) -> Self {
         let mut mpfr = uninitialized();
@@ -17,48 +18,56 @@ impl Mpfr {
         Self { mpfr: mpfr }
     }
 
+    /// Sets the value of `self` to zero.
     #[inline]
     pub fn set_zero(mut self) -> Self {
         unsafe { mpfr_set_zero(&mut self.mpfr, 1) };
         self
     }
 
+    /// Sets the value of `self` to negative zero.
     #[inline]
     pub fn set_neg_zero(mut self) -> Self {
         unsafe { mpfr_set_zero(&mut self.mpfr, -1) };
         self
     }
 
+    /// Sets the value of `self` to positive infinity.
     #[inline]
     pub fn set_infinity(mut self) -> Self {
         unsafe { mpfr_set_inf(&mut self.mpfr, 1) };
         self
     }
 
+    /// Sets the value of `self` to negative infinity.
     #[inline]
     pub fn set_neg_infinity(mut self) -> Self {
         unsafe { mpfr_set_inf(&mut self.mpfr, -1) };
         self
     }
 
+    /// Sets the value of `self` to NaN.
     #[inline]
     pub fn set_nan(mut self) -> Self {
         unsafe { mpfr_set_nan(&mut self.mpfr) };
         self
     }
 
+    /// Sets the value of `self` to `other`.
     #[inline]
-    pub fn set(mut self, val: &Self, rounding_mode: MpfrRnd) -> Self {
-        unsafe { mpfr_set(&mut self.mpfr, &val.mpfr, rounding_mode) };
+    pub fn set(mut self, other: &Self, rounding_mode: MpfrRnd) -> Self {
+        unsafe { mpfr_set(&mut self.mpfr, &other.mpfr, rounding_mode) };
         self
     }
 
+    /// Sets the value of `self` to `val`.
     #[inline]
     pub fn set_f64(mut self, val: f64, rounding_mode: MpfrRnd) -> Self {
         unsafe { mpfr_set_d(&mut self.mpfr, val, rounding_mode) };
         self
     }
 
+    /// Parses `c` and sets the value of `self` to the result.
     #[inline]
     pub fn set_str(mut self, c: CString, rounding_mode: MpfrRnd) -> Option<Self> {
         if unsafe { mpfr_set_str(&mut self.mpfr, c.as_ptr(), 10, rounding_mode) } == 0 {
@@ -68,6 +77,7 @@ impl Mpfr {
         }
     }
 
+    /// Returns an `f64` representing `self`.
     #[inline]
     pub fn as_f64(&self, rounding_mode: MpfrRnd) -> f64 {
         unsafe { mpfr_get_d(&self.mpfr, rounding_mode) }
@@ -82,6 +92,7 @@ impl Drop for Mpfr {
 }
 
 impl Mpfr {
+    /// Constructs an MPFR from an `f64` with custom precision and rounding mode.
     #[inline]
     pub fn from_custom(val: f64, precision: usize, rounding_mode: MpfrRnd) -> Self {
         unsafe { Self::uninitialized(precision) }.set_f64(val, rounding_mode)
@@ -96,6 +107,7 @@ impl From<f64> for Mpfr {
 }
 
 impl Mpfr {
+    /// Constructs an MPFR from an `&str` with custom precision and rounding mode.
     pub fn from_str_custom(s: &str,
                            precision: usize,
                            rounding_mode: MpfrRnd)
@@ -104,13 +116,14 @@ impl Mpfr {
             if let Some(res) = unsafe { Mpfr::uninitialized(precision) }.set_str(c, rounding_mode) {
                 Ok(res)
             } else {
-                Err(ParseMpfrError::MpfrError)
+                Err(ParseMpfrError::MpfrParseError)
             }
         } else {
             Err(ParseMpfrError::CStringError)
         }
     }
 
+    /// Constructs an MPFR from an `&str` with custom precision. Rounds to the nearest.
     pub fn from_str_with_prec(s: &str, precision: usize) -> Result<Self, ParseMpfrError> {
         Self::from_str_custom(s, precision, MpfrRnd::HalfToEven)
     }

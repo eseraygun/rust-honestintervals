@@ -1,17 +1,20 @@
 use super::def::IntervalSet;
 
 use fp::Float;
+use transc::Transc;
 
-impl<BOUND: Float> IntervalSet<BOUND> {
-    pub fn log(mut self) -> Self {
+impl<BOUND: Float> Transc for IntervalSet<BOUND> {
+    type Output = Self;
+
+     fn log(mut self) -> Self::Output {
         Self::from_intervals(self.intervals.drain(..).map(|i| i.log()).collect())
     }
 
-    pub fn exp(mut self) -> Self {
+     fn exp(mut self) -> Self::Output {
         Self::from_intervals(self.intervals.drain(..).map(|i| i.exp()).collect())
     }
 
-    pub fn pow(self, rhs: Self) -> Self {
+     fn pow(self, rhs: Self) -> Self::Output {
         self.binary_op(rhs, |i, j| i.pow_multi(j))
     }
 }

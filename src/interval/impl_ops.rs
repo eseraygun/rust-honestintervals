@@ -99,6 +99,7 @@ impl<BOUND: Float> Mul<Self> for Interval<BOUND> {
 }
 
 impl<BOUND: Float> Interval<BOUND> {
+    /// Divides `self` by `rhs` and returns a vector of intervals minimally covering the result.
     pub fn div_multi(self, rhs: Self) -> Vec<Self> {
         let precision = self.precision();
         match self.sign_class() {

@@ -7,6 +7,7 @@ use std::fmt::{Display, Formatter, Write};
 use std::str::FromStr;
 
 impl SignClass {
+    /// Whether `self` is `SignClass::Positive(_)`.
     pub fn is_positive(&self) -> bool {
         match *self {
             SignClass::Positive(_) => true,
@@ -14,6 +15,7 @@ impl SignClass {
         }
     }
 
+    /// Whether `self` is `SignClass::Negative(_)`.
     pub fn is_negative(&self) -> bool {
         match *self {
             SignClass::Negative(_) => true,
@@ -42,6 +44,13 @@ impl Display for SignClass {
 }
 
 impl<BOUND: Float> Interval<BOUND> {
+    /// Constructs a new interval from given bounds.
+    ///
+    /// Lower bound must be less than or equal to upper bound. Only exception is when they are both
+    /// NaNs, in which case a NaN (empty) interval is created.
+    ///
+    /// Cases where both bounds are negative infinity or positive infinity are not allowed as these
+    /// are empty sets. If you want to represent an empty set, use `Interval::nan()`.
     #[inline]
     pub fn new(lo: BOUND, hi: BOUND) -> Self {
         assert_eq!(lo.precision(), hi.precision(),
@@ -53,6 +62,7 @@ impl<BOUND: Float> Interval<BOUND> {
         Interval { lo: lo, hi: hi }
     }
 
+    /// Constructs the minimal interval that covers all of the given intervals.
     pub fn minimal_cover(mut intervals: Vec<Self>, precision: usize) -> Self {
         intervals.retain(|i| !i.is_nan());
         if intervals.is_empty() {
@@ -67,31 +77,41 @@ impl<BOUND: Float> Interval<BOUND> {
         Self { lo: lo, hi: hi }
     }
 
+    /// Constructs a singleton interval (an interval with only one element).
     #[inline]
     pub fn singleton(val: BOUND) -> Self {
         Self::new(val.clone(), val)
     }
 
+    /// Constructs an interval that contains only zero.
     #[inline]
     pub fn zero(precision: usize) -> Self {
         Self::new(BOUND::zero(precision), BOUND::zero(precision))
     }
 
+    /// Constructs an interval that contains only one.
     #[inline]
     pub fn one(precision: usize) -> Self {
         Self::new(BOUND::one(precision), BOUND::one(precision))
     }
 
+    /// Constructs a NaN (empty) interval.
     #[inline]
     pub fn nan(precision: usize) -> Self {
         Self::new(BOUND::nan(precision), BOUND::nan(precision))
     }
 
+    /// Constructs an interval that contains all numbers.
     #[inline]
     pub fn whole(precision: usize) -> Self {
         Self::new(BOUND::neg_infinity(precision), BOUND::infinity(precision))
     }
 
+    /// Constructs an interval by parsing a string.
+    ///
+    /// Accepts `INTERVAL` according to the rule below.
+    ///
+    ///   INTERVAL = FLOAT | '<' FLOAT ',' FLOAT '>'
     pub fn from_str_with_prec(s: &str, precision: usize) -> Result<Self, ParseIntervalError> {
         let lo = BOUND::from_str_lo(s, precision);
         let hi = BOUND::from_str_hi(s, precision);
@@ -121,6 +141,7 @@ impl<BOUND: Float> Interval<BOUND> {
         }
     }
 
+    /// Returns the sign class of `self`.
     #[inline]
     pub fn sign_class(&self) -> SignClass {
         match self.lo.sign() {
@@ -142,12 +163,17 @@ impl<BOUND: Float> Interval<BOUND> {
         }
     }
 
+    /// Returns the precision of `self`.
     #[inline]
     pub fn precision(&self) -> usize {
         assert!(self.lo.precision() == self.hi.precision());
         self.lo.precision()
     }
 
+    /// Returns the difference between the upper bound and the lower bound of `self`.
+    ///
+    /// As the result is not always exactly representable as `BOUND`, an interval is returned
+    /// instead.
     #[inline]
     pub fn size(&self) -> Self {
         if self.is_whole() {
@@ -157,32 +183,40 @@ impl<BOUND: Float> Interval<BOUND> {
         }
     }
 
+    /// Whether `self` is a singleton interval (an interval containing only one element).
     #[inline]
     pub fn is_singleton(&self) -> bool {
         self.lo == self.hi
     }
 
+    /// Whether `self` contains only zero.
     #[inline]
     pub fn is_zero(&self) -> bool {
         self.lo.sign() == Sign::Zero && self.hi.sign() == Sign::Zero && !self.is_nan()
     }
 
+    /// Whether `self` is NaN (empty).
     #[inline]
     pub fn is_nan(&self) -> bool {
         assert!(self.lo.is_nan() == self.hi.is_nan());
         self.lo.is_nan()
     }
 
+    /// Whether `self` contains all numbers.
     #[inline]
     pub fn is_whole(&self) -> bool {
         self.lo.is_neg_infinity() && self.hi.is_infinity()
     }
 
+    /// Whether `self` contains zero.
     #[inline]
     pub fn has_zero(&self) -> bool {
         self.lo.sign() <= Sign::Zero && self.hi.sign() >= Sign::Zero
     }
 
+    /// Cuts `self` into two at `val` and returns the left and right pieces as a pair.
+    ///
+    /// If `self` lies on only one side of `val`, the non-existent side will be a NaN interval.
     #[inline]
     pub fn split(self, val: BOUND) -> (Self, Self) {
         let precision = self.precision();
@@ -231,7 +265,7 @@ impl<BOUND: Float> Display for Interval<BOUND> {
     }
 }
 
-impl<BOUND> Into<(BOUND, BOUND)> for Interval<BOUND> {
+impl<BOUND: Float> Into<(BOUND, BOUND)> for Interval<BOUND> {
     fn into(self) -> (BOUND, BOUND) {
         (self.lo, self.hi)
     }

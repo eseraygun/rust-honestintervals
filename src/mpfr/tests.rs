@@ -37,7 +37,7 @@ fn test_from_str() {
 fn test_from_str_custom_failures() {
     assert_eq!(ParseMpfrError::CStringError,
                Mpfr::from_str_custom("0\00", PREC, MpfrRnd::HalfToEven).err().unwrap());
-    assert_eq!(ParseMpfrError::MpfrError,
+    assert_eq!(ParseMpfrError::MpfrParseError,
                Mpfr::from_str_custom("0a0", PREC, MpfrRnd::HalfToEven).err().unwrap());
 }
 
@@ -294,4 +294,91 @@ fn test_exp_hi() {
     use fp::Transc;
     assert_str_eq!("3", mpfr!("1").exp_hi());
     assert_str_eq!("8", mpfr!("2").exp_hi());
+}
+
+#[test]
+fn test_pow_lo() {
+    use fp::Transc;
+    assert_str_eq!("1", mpfr!("1").pow_lo(mpfr!("1.5")));
+    assert_str_eq!("0.5", mpfr!("0.5").pow_lo(mpfr!("0.75")));
+}
+
+#[test]
+fn test_pow_hi() {
+    use fp::Transc;
+    assert_str_eq!("1", mpfr!("1").pow_hi(mpfr!("1.5")));
+    assert_str_eq!("0.75", mpfr!("0.5").pow_hi(mpfr!("0.75")));
+}
+
+#[test]
+fn test_constants() {
+    use fp::Float;
+    assert_str_eq!("0", Mpfr::zero(PREC));
+    assert_str_eq!("inf", Mpfr::one(PREC) / Mpfr::zero(PREC));
+    assert_str_eq!("0", Mpfr::neg_zero(PREC));
+    assert_str_eq!("-inf", Mpfr::one(PREC) / Mpfr::neg_zero(PREC));
+    assert_str_eq!("1", Mpfr::one(PREC));
+    assert_str_eq!("inf", Mpfr::infinity(PREC));
+    assert_str_eq!("-inf", Mpfr::neg_infinity(PREC));
+    assert_str_eq!("NaN", Mpfr::nan(PREC));
+}
+
+#[test]
+fn test_is_finite() {
+    use fp::Float;
+    assert!(mpfr!("0").is_finite());
+    assert!(mpfr!("1").is_finite());
+    assert!(!mpfr!("inf").is_finite());
+    assert!(!mpfr!("-inf").is_finite());
+    assert!(!mpfr!("NaN").is_finite());
+}
+
+#[test]
+fn test_is_infinite() {
+    use fp::Float;
+    assert!(!mpfr!("0").is_infinite());
+    assert!(!mpfr!("1").is_infinite());
+    assert!(mpfr!("inf").is_infinite());
+    assert!(mpfr!("-inf").is_infinite());
+    assert!(!mpfr!("NaN").is_infinite());
+}
+
+#[test]
+fn test_is_zero() {
+    use fp::Float;
+    assert!(mpfr!("0").is_zero());
+    assert!(!mpfr!("1").is_zero());
+    assert!(!mpfr!("inf").is_zero());
+    assert!(!mpfr!("-inf").is_zero());
+    assert!(!mpfr!("NaN").is_zero());
+}
+
+#[test]
+fn test_is_infinity() {
+    use fp::Float;
+    assert!(!mpfr!("0").is_infinity());
+    assert!(!mpfr!("1").is_infinity());
+    assert!(mpfr!("inf").is_infinity());
+    assert!(!mpfr!("-inf").is_infinity());
+    assert!(!mpfr!("NaN").is_infinity());
+}
+
+#[test]
+fn test_is_neg_infinity() {
+    use fp::Float;
+    assert!(!mpfr!("0").is_neg_infinity());
+    assert!(!mpfr!("1").is_neg_infinity());
+    assert!(!mpfr!("inf").is_neg_infinity());
+    assert!(mpfr!("-inf").is_neg_infinity());
+    assert!(!mpfr!("NaN").is_neg_infinity());
+}
+
+#[test]
+fn test_is_nan() {
+    use fp::Float;
+    assert!(!mpfr!("0").is_nan());
+    assert!(!mpfr!("1").is_nan());
+    assert!(!mpfr!("inf").is_nan());
+    assert!(!mpfr!("-inf").is_nan());
+    assert!(mpfr!("NaN").is_nan());
 }

@@ -1,6 +1,7 @@
 use super::def::{Interval, SignClass};
 
 use fp::Float;
+use transc::Transc;
 
 impl<BOUND: Float> Interval<BOUND> {
     fn pow_p_p_multi(self, rhs: Self) -> Vec<Self> {
@@ -12,14 +13,14 @@ impl<BOUND: Float> Interval<BOUND> {
         let (self_01, self_1i) = self.split(BOUND::one(precision));
         if !self_1i.is_nan() {
             intervals.push(Self::new(
-                (self_1i.lo.log_lo().mul_lo(rhs.lo.clone())).exp_lo(),
-                (self_1i.hi.log_hi().mul_hi(rhs.hi.clone())).exp_hi(),
+                self_1i.lo.pow_lo(rhs.lo.clone()),
+                self_1i.hi.pow_hi(rhs.hi.clone()),
             ));
         }
         if !self_01.is_nan() {
             intervals.push(Self::new(
-                (self_01.lo.log_lo().mul_lo(rhs.hi)).exp_lo(),
-                (self_01.hi.log_hi().mul_hi(rhs.lo)).exp_hi(),
+                self_01.lo.pow_lo(rhs.hi),
+                self_01.hi.pow_hi(rhs.lo),
             ));
         }
         intervals
@@ -61,6 +62,8 @@ impl<BOUND: Float> Interval<BOUND> {
         intervals
     }
 
+    /// Computes `self` raised to the power `rhs` and returns a vector of intervals minimally
+    /// covering the result.
     pub fn pow_multi(self, rhs: Self) -> Vec<Self> {
         let precision = self.precision();
 
@@ -89,8 +92,10 @@ impl<BOUND: Float> Interval<BOUND> {
     }
 }
 
-impl<BOUND: Float> Interval<BOUND> {
-    pub fn log(self) -> Self {
+impl<BOUND: Float> Transc for Interval<BOUND> {
+    type Output = Self;
+
+    fn log(self) -> Self::Output {
         match self.sign_class() {
             SignClass::Mixed => Self::new(
                 BOUND::neg_infinity(self.precision()),
@@ -112,11 +117,11 @@ impl<BOUND: Float> Interval<BOUND> {
         }
     }
 
-    pub fn exp(self) -> Self {
+    fn exp(self) -> Self::Output {
         Interval::new(self.lo.exp_lo(), self.hi.exp_hi())
     }
 
-    pub fn pow(self, rhs: Self) -> Self {
+    fn pow(self, rhs: Self) -> Self::Output {
         let precision = self.precision();
         Self::minimal_cover(self.pow_multi(rhs), precision)
     }

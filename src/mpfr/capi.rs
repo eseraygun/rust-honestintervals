@@ -1,20 +1,32 @@
 use libc::{c_char, c_double, c_int, c_long, c_longlong};
 
+/// MPFR rounding mode enum.
 #[repr(C)]
 pub enum MpfrRnd {
+    /// Round to the nearest representable number. Ties goes to the even number.
     HalfToEven = 0,
+    /// Round towards zero.
     TowardsZero,
+    /// Round towards positive infinity.
     Up,
+    /// Round towards negative infinity.
     Down,
+    /// Round away from zero.
     AwayFromZero,
+    /// Round to the nearest representable number. Ties goes away from zero.
     HalfAwayFromZero = -1,
 }
 
+/// MPFR precision type.
 pub type MpfrPrec = c_long;
+/// MPFR sign type.
 pub type MpfrSign = c_int;
+/// MPFR exponent type.
 pub type MpfrExp = c_long;
+/// MPFR limb type.
 pub type MpLimb = c_longlong;
 
+/// Low-level MPFR struct.
 #[repr(C)]
 #[derive(Debug)]
 pub struct MpfrStruct {
@@ -27,6 +39,8 @@ pub struct MpfrStruct {
 type MpfrPtr = *mut MpfrStruct;
 type MpfrConstPtr = *const MpfrStruct;
 
+/// External calls to MPFR library. See http://www.mpfr.org/mpfr-current/mpfr.html for details.
+#[allow(missing_docs)]
 #[link(name = "mpfr")]
 extern "C" {
     // Initialization functions.
@@ -65,6 +79,7 @@ extern "C" {
     pub fn mpfr_sub(rop: MpfrPtr, op1: MpfrConstPtr, op2: MpfrConstPtr, rnd: MpfrRnd) -> c_int;
     pub fn mpfr_mul(rop: MpfrPtr, op1: MpfrConstPtr, op2: MpfrConstPtr, rnd: MpfrRnd) -> c_int;
     pub fn mpfr_div(rop: MpfrPtr, op1: MpfrConstPtr, op2: MpfrConstPtr, rnd: MpfrRnd) -> c_int;
+    pub fn mpfr_pow(rop: MpfrPtr, op1: MpfrConstPtr, op2: MpfrConstPtr, rnd: MpfrRnd) -> c_int;
 
     // Special functions.
     pub fn mpfr_log(rop: MpfrPtr, op: MpfrConstPtr, rnd: MpfrRnd) -> c_int;

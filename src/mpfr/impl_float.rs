@@ -155,31 +155,43 @@ impl fp::Div<Mpfr> for Mpfr {
 }
 
 impl fp::Transc for Mpfr {
-    type Output = Mpfr;
+    type Output = Self;
 
     #[inline]
-    fn log_lo(mut self) -> Mpfr {
+    fn log_lo(mut self) -> Self::Output {
         unsafe { mpfr_log(&mut self.mpfr, &self.mpfr, MpfrRnd::Down); }
         self
     }
 
 
     #[inline]
-    fn log_hi(mut self) -> Mpfr {
+    fn log_hi(mut self) -> Self::Output {
         unsafe { mpfr_log(&mut self.mpfr, &self.mpfr, MpfrRnd::Up); }
         self
     }
 
     #[inline]
-    fn exp_lo(mut self) -> Mpfr {
+    fn exp_lo(mut self) -> Self::Output {
         unsafe { mpfr_exp(&mut self.mpfr, &self.mpfr, MpfrRnd::Down); }
         self
     }
 
 
     #[inline]
-    fn exp_hi(mut self) -> Mpfr {
+    fn exp_hi(mut self) -> Self::Output {
         unsafe { mpfr_exp(&mut self.mpfr, &self.mpfr, MpfrRnd::Up); }
+        self
+    }
+
+    fn pow_lo(mut self, rhs: Self) -> Self::Output {
+        assert_eq!(self.precision(), rhs.precision());
+        unsafe { mpfr_pow(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::Down); }
+        self
+    }
+
+    fn pow_hi(mut self, rhs: Self) -> Self::Output {
+        assert_eq!(self.precision(), rhs.precision());
+        unsafe { mpfr_pow(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::Up); }
         self
     }
 }
