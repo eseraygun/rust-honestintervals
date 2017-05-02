@@ -6,4 +6,4 @@ mod impl_transc;
 #[cfg(test)]
 mod tests;
 
-pub use self::def::{Interval, SignClass};
+pub use self::def::{Interval, ParseIntervalError, SignClass};

@@ -159,6 +159,7 @@ impl<BOUND: Float> Interval<BOUND> {
             (self, Self::nan(precision))
         } else {
             if self.is_nan() {
+                let precision = self.precision();
                 (Self::nan(precision), Self::nan(precision))
             } else {
                 (Self::new(self.lo, val.clone()), Self::new(val, self.hi))

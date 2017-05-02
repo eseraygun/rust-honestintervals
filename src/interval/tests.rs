@@ -1,7 +1,10 @@
-use fp::Float;
+use super::Interval;
 
-type B = ::mpfr::Mpfr;
-type IV = ::interval::Interval<::mpfr::Mpfr>;
+use fp::Float;
+use mpfr::Mpfr;
+
+type B = Mpfr;
+type IV = Interval<B>;
 
 const PREC: usize = 2;
 
