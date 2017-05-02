@@ -90,10 +90,12 @@ impl<BOUND: Float> IntervalSet<BOUND> {
             if !s.ends_with('}') { return Err(ParseIntervalSetError::MissingClosingBraces) }
             let s = s.trim_right_matches('}').trim_right();
             if s.is_empty() { return Ok(Self::empty()) }
-            let mut intervals = s.split(';').map(|v| Interval::from_str_with_prec(v.trim(), precision))
-                .collect::<Vec<Result<Interval<BOUND>, ParseIntervalError>>>();
-            if intervals.iter().all(|i| i.is_ok()) {
-                Ok(Self::from_intervals(intervals.drain(..).map(|i| i.unwrap()).collect()))
+            let mut results: Vec<_> = s.split(';')
+                .map(|v| v.trim())
+                .map(|v| Interval::from_str_with_prec(v, precision))
+                .collect();
+            if results.iter().all(|i| i.is_ok()) {
+                Ok(Self::from_intervals(results.drain(..).map(|i| i.unwrap()).collect()))
             } else {
                 Err(ParseIntervalSetError::IntervalsParseError)
             }
@@ -137,7 +139,7 @@ impl<BOUND: Float> IntervalSet<BOUND> {
 impl<BOUND: Float> From<f64> for IntervalSet<BOUND> {
     #[inline]
     fn from(val: f64) -> Self {
-        Self::singleton(BOUND::from(val))
+        Self::new(BOUND::from_lo(val, 53), BOUND::from_hi(val, 53))
     }
 }
 
@@ -166,5 +168,11 @@ impl<BOUND: Float> Display for IntervalSet<BOUND> {
             }
             f.write_char('}')
         }
+    }
+}
+
+impl<BOUND: Float> Into<Vec<(BOUND, BOUND)>> for IntervalSet<BOUND> {
+    fn into(mut self) -> Vec<(BOUND, BOUND)> {
+        self.intervals.drain(..).map(|i| (i.lo, i.hi)).collect()
     }
 }

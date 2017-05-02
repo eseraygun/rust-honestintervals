@@ -21,10 +21,6 @@ macro_rules! iv {
     ($s:expr) => { IV::from_str_with_prec($s, PREC).unwrap() }
 }
 
-macro_rules! iv_fn {
-    ($n:tt) => { IV::$n };
-}
-
 #[test]
 fn test_new() {
     assert_str_eq!("<0, 1>", IV::new(b!("0"), b!("1")));
@@ -207,26 +203,55 @@ fn test_split() {
 }
 
 #[test]
+fn test_from_f64() {
+    use std::f64;
+    assert_str_eq!("0", IV::from(0f64));
+    assert_str_eq!("0.9999999999999999", IV::from(0.9999999999999999));
+    assert_str_eq!("1.000000000000001", IV::from(1.000000000000001));
+    assert_str_eq!("-0.9999999999999999", IV::from(-0.9999999999999999));
+    assert_str_eq!("-1.000000000000001", IV::from(-1.000000000000001));
+    assert_str_eq!("NaN", IV::from(f64::NAN));
+}
+
+#[test]
+fn test_from_str() {
+    use std::str::FromStr;
+    assert_str_eq!("0", IV::from_str("0").unwrap());
+    assert_str_eq!("<0.9999999999999999, 1>", IV::from_str("0.9999999999999999").unwrap());
+    assert_str_eq!("<1.0000000000000009, 1.000000000000001>", IV::from_str("1.000000000000001").unwrap());
+    assert_str_eq!("<-1, -0.9999999999999999>", IV::from_str("-0.9999999999999999").unwrap());
+    assert_str_eq!("<-1.000000000000001, -1.0000000000000009>", IV::from_str("-1.000000000000001").unwrap());
+    assert_str_eq!("NaN", IV::from_str("NaN").unwrap());
+}
+
+#[test]
+fn test_clone() {
+    let x = iv!("<0, 1>");
+    assert_eq!(x, x.clone());
+    let mut y = iv!("<1, 2>");
+    y.clone_from(&x);
+    assert_eq!(x, y);
+}
+
+#[test]
+fn test_into_pair() {
+    let (lo, hi) = iv!("<0, 1>").into();
+    assert_str_eq!("0", lo);
+    assert_str_eq!("1", hi);
+}
+
+#[test]
 fn test_partial_eq() {
-    test_binary_op(|x, y| x == y, simple(), vec![
-        ("nan.*", "false"),
-        ("whl.whl", "true"),
-        ("whl.*", "false"),
-        ("m.m", "true"),
-        ("m.*", "false"),
-        ("z.z", "true"),
-        ("z.*", "false"),
-        ("p.p", "true"),
-        ("p.*", "false"),
-        ("n.n", "true"),
-        ("n.*", "false"),
-    ], false);
+    assert!(iv!("NaN") == iv!("NaN"));
+    assert!(iv!("0") == iv!("0"));
+    assert!(iv!("<0, 1>") == iv!("<0, 1>"));
+    assert!(iv!("<0, 1>") != iv!("<0, 2>"));
 }
 
 #[test]
 fn test_neg() {
     use std::ops::Neg;
-    test_unary_op(iv_fn!(neg), simple(), vec![
+    test_unary_op(IV::neg, simple(), vec![
         ("nan", "NaN"),
         ("whl", "<-inf, inf>"),
         ("m", "<-1, 1>"),
@@ -239,72 +264,78 @@ fn test_neg() {
 #[test]
 fn test_add() {
     use std::ops::Add;
-    test_binary_op(iv_fn!(add), simple(), vec![
+    test_binary_op(IV::add, simple(), vec![
+        ("nan.*", "NaN"),
+        ("whl.*", "<-inf, inf>"),
+        ("m.m", "<-2, 2>"),
+        ("m.z", "<-1, 1>"),
+        ("m.p", "<0, 3>"),
+        ("m.n", "<-3, 0>"),
+        ("z.z", "0"),
+        ("z.p", "<1, 2>"),
+        ("z.n", "<-2, -1>"),
+        ("p.p", "<2, 4>"),
+        ("p.n", "<-1, 1>"),
+        ("n.n", "<-4, -2>"),
+    ], true, false);
+}
+
+#[test]
+fn test_sub() {
+    use std::ops::Sub;
+    test_binary_op(IV::sub, simple(), vec![
         ("nan.*", "NaN"),
         ("*.nan", "NaN"),
         ("whl.*", "<-inf, inf>"),
         ("*.whl", "<-inf, inf>"),
         ("m.m", "<-2, 2>"),
         ("m.z", "<-1, 1>"),
-        ("m.p", "<0, 3>"),
-        ("m.n", "<-3, 0>"),
+        ("m.p", "<-3, 0>"),
+        ("m.n", "<0, 3>"),
         ("z.m", "<-1, 1>"),
         ("z.z", "0"),
-        ("z.p", "<1, 2>"),
-        ("z.n", "<-2, -1>"),
+        ("z.p", "<-2, -1>"),
+        ("z.n", "<1, 2>"),
         ("p.m", "<0, 3>"),
         ("p.z", "<1, 2>"),
-        ("p.p", "<2, 4>"),
-        ("p.n", "<-1, 1>"),
+        ("p.p", "<-1, 1>"),
+        ("p.n", "<2, 4>"),
         ("n.m", "<-3, 0>"),
         ("n.z", "<-2, -1>"),
-        ("n.p", "<-1, 1>"),
-        ("n.n", "<-4, -2>"),
-    ], false);
+        ("n.p", "<-4, -2>"),
+        ("n.n", "<-1, 1>"),
+    ], false, false);
 }
 
 #[test]
 fn test_mul() {
     use std::ops::Mul;
-    test_binary_op(iv_fn!(mul), all_sign_classes(), vec![
+    test_binary_op(IV::mul, all_sign_classes(), vec![
         ("nan.*", "NaN"),
-        ("*.nan", "NaN"),
         ("z.*", "0"),
-        ("*.z", "0"),
         ("whl.*", "<-inf, inf>"),
-        ("*.whl", "<-inf, inf>"),
         ("m.m", "<-1, 1>"),
         ("m.p0", "<-1, 1>"),
         ("m.p1", "<-2, 2>"),
         ("m.n0", "<-1, 1>"),
         ("m.n1", "<-2, 2>"),
-        ("p0.m", "<-1, 1>"),
         ("p0.p0", "<0, 1>"),
         ("p0.p1", "<0, 2>"),
         ("p0.n0", "<-1, 0>"),
         ("p0.n1", "<-2, 0>"),
-        ("p1.m", "<-2, 2>"),
-        ("p1.p0", "<0, 2>"),
         ("p1.p1", "<1, 4>"),
         ("p1.n0", "<-2, 0>"),
         ("p1.n1", "<-4, -1>"),
-        ("n0.m", "<-1, 1>"),
-        ("n0.p0", "<-1, 0>"),
-        ("n0.p1", "<-2, 0>"),
         ("n0.n0", "<0, 1>"),
         ("n0.n1", "<0, 2>"),
-        ("n1.m", "<-2, 2>"),
-        ("n1.p0", "<-2, 0>"),
-        ("n1.p1", "<-4, -1>"),
-        ("n1.n0", "<0, 2>"),
         ("n1.n1", "<1, 4>"),
-    ], false);
+    ], true, false);
 }
 
 #[test]
 fn test_div() {
     use std::ops::Div;
-    test_binary_op(iv_fn!(div), all_sign_classes(), vec![
+    test_binary_op(IV::div, all_sign_classes(), vec![
         ("nan.*", "NaN"),
         ("*.nan", "NaN"),
         ("*.z", "NaN"),
@@ -336,12 +367,12 @@ fn test_div() {
         ("n1.p1", "<-2, -0.5>"),
         ("n1.n0", "<1, inf>"),
         ("n1.n1", "<0.5, 2>"),
-    ], false);
+    ], false, false);
 }
 
 #[test]
 fn test_log() {
-    test_unary_op(iv_fn!(log), all_sign_classes(), vec![
+    test_unary_op(IV::log, all_sign_classes(), vec![
         ("nan", "NaN"),
         ("whl", "<-inf, inf>"),
         ("m", "<-inf, 0>"),
@@ -355,7 +386,7 @@ fn test_log() {
 
 #[test]
 fn test_exp() {
-    test_unary_op(iv_fn!(exp), all_sign_classes(), vec![
+    test_unary_op(IV::exp, all_sign_classes(), vec![
         ("nan", "NaN"),
         ("whl", "<0, inf>"),
         ("m", "<0.25, 3>"),
@@ -401,18 +432,26 @@ fn find_unary_case<'x, 'z>(cases: &'z Vec<(&str, &str)>, cx: &'x str) -> &'z str
     panic!("unmatched case: {}", cx);
 }
 
-fn find_binary_case<'x, 'y, 'z>(cases: &'z Vec<(&str, &str)>, cx: &'x str, cy: &'y str) -> &'z str {
+fn find_binary_case<'x, 'y, 'z>(cases: &'z Vec<(&str, &str)>,
+                                cx: &'x str, cy: &'y str,
+                                commutative: bool)
+                                -> Option<&'z str> {
     for &(ref cz, ref z) in cases {
         let cz = String::from(cz.clone());
-        let is_match = format!("{}.{}", cx, cy) == cz ||
+        let mut is_match = format!("{}.{}", cx, cy) == cz ||
             format!("{}.*", cx).as_str() == cz ||
             format!("*.{}", cy).as_str() == cz ||
             format!("*.*").as_str() == cz;
+        if commutative {
+            is_match = is_match || format!("{}.{}", cy, cx) == cz ||
+                format!("{}.*", cy).as_str() == cz ||
+                format!("*.{}", cx).as_str() == cz;
+        }
         if is_match {
-            return z;
+            return Some(z)
         }
     }
-    panic!("unmatched case: {}.{}", cx, cy);
+    None
 }
 
 pub fn test_unary_op<'a, OP, R>(op: OP,
@@ -434,18 +473,32 @@ pub fn test_unary_op<'a, OP, R>(op: OP,
 
 pub fn test_binary_op<'a, OP, R>(op: OP,
                                  cases: Vec<(&'a str, IV)>,
-                                 expected: Vec<(&str, &str)>,
-                                 print: bool)
+                                 mut expected: Vec<(&str, &str)>,
+                                 commutative: bool, print: bool)
     where OP: Fn(IV, IV) -> R, R: ::std::fmt::Display + Sized
 {
+    let mut expected_up_to_now = Vec::<(&str, &str)>::new();
+    for (cz, z) in expected.drain(..) {
+        let parts = cz.split(".").collect::<Vec<_>>();
+        let (cx, cy) = (parts[0], parts[1]);
+        if find_binary_case(&expected_up_to_now, cx, cy, commutative).is_some() {
+            panic!("redundant case: {}.{}", cx, cy);
+        }
+        expected_up_to_now.push((cz, z));
+    }
+    expected = expected_up_to_now;
+
     for (cx, x) in cases.clone() {
         for (cy, y) in cases.clone() {
             let z = op(x.clone(), y.clone());
             if print {
                 println!("    (\"{}.{}\", \"{}\"),", cx, cy, z);
             } else {
-                assert_str_eq!(String::from(find_binary_case(&expected, cx, cy)), z,
-                               "{}.{} ({} . {})", cx, cy, x, y);
+                if let Some(cz) = find_binary_case(&expected, cx, cy, commutative) {
+                    assert_str_eq!(String::from(cz), z, "{}.{} ({} . {})", cx, cy, x, y);
+                } else {
+                    panic!("unmatched case: {}.{}", cx, cy);
+                }
             }
         }
     }

@@ -16,7 +16,7 @@ pub enum SignClass {
     Negative(bool),
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug)]
 pub struct Interval<BOUND> {
     pub lo: BOUND,
     pub hi: BOUND,

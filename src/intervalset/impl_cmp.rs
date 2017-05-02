@@ -1,15 +1,15 @@
-#[cfg(test)]
-mod test {
-    use float::{Float, RoundingMode};
-    use interval::Interval;
-    use intervalset::IntervalSet;
-    use mpfr::Mpfr;
+use super::def::IntervalSet;
 
-    #[test]
-    fn test_partial_eq() {
-        assert!(interval_set!{[0]} == interval_set!{[0]});
-        assert!(interval_set!{[0, 1]} == interval_set!{[0, 1]});
-        assert!(interval_set!{[0, 1]; [2]} == interval_set!{[0, 1]; [2]});
-        assert!(interval_set!{[0, 1]} != interval_set!{[0, 123]});
+use fp::Float;
+
+impl<BOUND: Float> PartialEq for IntervalSet<BOUND> {
+    #[inline]
+    fn eq(&self, rhs: &Self) -> bool {
+        for (i, j) in self.intervals.iter().zip(&rhs.intervals) {
+            if !(i.lo == j.lo && i.hi == j.hi) {
+                return false;
+            }
+        }
+        true
     }
 }

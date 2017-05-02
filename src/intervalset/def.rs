@@ -7,7 +7,7 @@ pub enum ParseIntervalSetError {
     IntervalsParseError,
 }
 
-#[derive(Clone, Debug, PartialEq)]
-pub struct IntervalSet<F> {
-    pub intervals: Vec<Interval<F>>,
+#[derive(Clone, Debug)]
+pub struct IntervalSet<BOUND: PartialEq> {
+    pub intervals: Vec<Interval<BOUND>>,
 }
