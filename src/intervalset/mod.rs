@@ -7,4 +7,4 @@ mod impl_transc;
 #[cfg(test)]
 mod tests;
 
-pub use self::def::IntervalSet;
+pub use self::def::{IntervalSet, ParseIntervalSetError};

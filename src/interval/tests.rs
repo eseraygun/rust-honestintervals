@@ -1,8 +1,6 @@
 use super::Interval;
 
-use fp::Float;
 use mpfr::Mpfr;
-use transc::Transc;
 
 type B = Mpfr;
 type IV = Interval<B>;
@@ -34,6 +32,7 @@ fn test_new() {
 #[test]
 #[should_panic]
 fn test_new_different_precisions() {
+    use fp::Float;
     IV::new(B::zero(24), B::zero(53));
 }
 
@@ -97,6 +96,7 @@ fn test_sign_class() {
 
 #[test]
 fn test_precision() {
+    use fp::Float;
     assert_eq!(2usize, IV::new(B::zero(2), B::zero(2)).precision());
     assert_eq!(53usize, IV::new(B::zero(53), B::zero(53)).precision());
 }
@@ -373,6 +373,7 @@ fn test_div() {
 
 #[test]
 fn test_log() {
+    use transc::Transc;
     test_unary_op(IV::log, all_sign_classes(), vec![
         ("nan", "NaN"),
         ("whl", "<-inf, inf>"),
@@ -387,6 +388,7 @@ fn test_log() {
 
 #[test]
 fn test_exp() {
+    use transc::Transc;
     test_unary_op(IV::exp, all_sign_classes(), vec![
         ("nan", "NaN"),
         ("whl", "<0, inf>"),
@@ -401,6 +403,7 @@ fn test_exp() {
 
 #[test]
 fn test_pow() {
+    use transc::Transc;
     test_binary_op(IV::pow, all_sign_classes_small_and_big(), vec![
         ("nan.*", "NaN"),
         ("*.nan", "NaN"),

@@ -1,5 +1,4 @@
 #[macro_use]
-mod macros;
 mod capi;
 mod def;
 mod impl_basic;

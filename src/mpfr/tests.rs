@@ -2,6 +2,11 @@ use super::{Mpfr, MpfrRnd, ParseMpfrError};
 
 const PREC: usize = 2;
 
+macro_rules! assert_str_eq {
+    ($x:expr, $y:expr) => { assert_eq!($x, format!("{}", $y)) };
+    ($x:expr, $y:expr, $($arg:tt)+) => { assert_eq!($x, format!("{}", $y), $($arg)+) };
+}
+
 macro_rules! mpfr {
     ($v:expr) => { ::mpfr::Mpfr::from_str_with_prec($v, PREC).unwrap() };
     ($v:expr, $p:expr) => { ::mpfr::Mpfr::from_str_with_prec($v, $p).unwrap() };
