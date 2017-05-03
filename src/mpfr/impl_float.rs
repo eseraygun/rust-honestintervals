@@ -45,17 +45,17 @@ impl fp::Into<f64> for Mpfr {
 }
 
 impl fp::MinMax<Mpfr> for Mpfr {
-    type Output = Mpfr;
+    type Output = Self;
 
     #[inline]
-    fn min(mut self, rhs: Mpfr) -> Mpfr {
+    fn min(mut self, rhs: Self) -> Self {
         assert_eq!(self.precision(), rhs.precision());
         unsafe { mpfr_min(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::HalfToEven); }
         self
     }
 
     #[inline]
-    fn max(mut self, rhs: Mpfr) -> Mpfr {
+    fn max(mut self, rhs: Self) -> Self {
         assert_eq!(self.precision(), rhs.precision());
         unsafe { mpfr_max(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::HalfToEven); }
         self

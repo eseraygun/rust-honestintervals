@@ -1,4 +1,4 @@
-#![deny(missing_docs)]
+// TODO #![deny(missing_docs)]
 
 //! Honest Intervals is an interval arithmetic library with correct rounding.
 //!
@@ -33,6 +33,8 @@ pub mod transc;
 /// GNU MPFR is a C library that provides arbitrary precision floating-point functionality. This
 /// module defines `mpfr::Mpfr` struct which implements `fp::Float` using GNU MPFR.
 pub mod mpfr;
+
+pub mod ieee;
 
 /// Interval module.
 ///
