@@ -130,8 +130,8 @@ impl<BOUND: Float> Interval<BOUND> {
             let s = s.trim_right_matches('>').trim_right();
             let p: Vec<&str> = s.split(',').collect();
             if p.len() == 2 {
-                let lo = BOUND::from_str_lo(p[0], precision);
-                let hi = BOUND::from_str_hi(p[1], precision);
+                let lo = BOUND::from_str_lo(p[0].trim(), precision);
+                let hi = BOUND::from_str_hi(p[1].trim(), precision);
                 if let (Ok(lo), Ok(hi)) = (lo, hi) {
                     if !lo.is_nan() && !hi.is_nan() && lo <= hi || lo.is_nan() && hi.is_nan() {
                         Ok(Self::new(lo, hi))
