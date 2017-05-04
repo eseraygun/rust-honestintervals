@@ -385,23 +385,6 @@ fn all_sign_classes<'a>() -> Vec<(&'a str, IV)> {
     ]
 }
 
-//fn all_sign_classes_small_and_big<'a>() -> Vec<(&'a str, IV)> {
-//    vec![
-//        ("nan", iv!("NaN")),
-//        ("whl", iv!("<-inf, inf>")),
-//        ("m", iv!("<-1, 1>")),
-//        ("z", iv!("0")),
-//        ("p0s", iv!("<0, 0.75>")),
-//        ("p0b", iv!("<0, 1.5>")),
-//        ("p1s", iv!("<0.75, 2>")),
-//        ("p1b", iv!("<1.5, 2>")),
-//        ("n0s", iv!("<-0.75, 0>")),
-//        ("n0b", iv!("<-1.5, 0>")),
-//        ("n1s", iv!("<-2, -0.75>")),
-//        ("n1b", iv!("<-2, -1.5>")),
-//    ]
-//}
-
 fn find_unary_case<'x, 'z>(cases: &'z Vec<(&str, &str)>, cx: &'x str) -> &'z str {
     for &(ref cz, ref z) in cases {
         let is_match = &format!("{}", cx).as_str() == cz || &format!("*").as_str() == cz;
