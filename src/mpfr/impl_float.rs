@@ -1,5 +1,5 @@
 use super::capi::*;
-use super::def::{Mpfr, ParseMpfrError};
+use super::def::Mpfr;
 
 use fp;
 use fp::{Float, Sign};
@@ -19,8 +19,6 @@ impl fp::From<f64> for Mpfr {
 }
 
 impl fp::FromStr for Mpfr {
-    type Err = ParseMpfrError;
-
     #[inline]
     fn from_str_lo(s: &str, precision: usize) -> Result<Self, Self::Err> {
         Self::from_str_custom(s, precision, MpfrRnd::Down)
@@ -44,18 +42,16 @@ impl fp::Into<f64> for Mpfr {
     }
 }
 
-impl fp::MinMax<Mpfr> for Mpfr {
-    type Output = Mpfr;
-
+impl fp::MinMax for Mpfr {
     #[inline]
-    fn min(mut self, rhs: Mpfr) -> Mpfr {
+    fn min(mut self, rhs: Self) -> Self {
         assert_eq!(self.precision(), rhs.precision());
         unsafe { mpfr_min(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::HalfToEven); }
         self
     }
 
     #[inline]
-    fn max(mut self, rhs: Mpfr) -> Mpfr {
+    fn max(mut self, rhs: Self) -> Self {
         assert_eq!(self.precision(), rhs.precision());
         unsafe { mpfr_max(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::HalfToEven); }
         self
@@ -66,88 +62,78 @@ impl Neg for Mpfr {
     type Output = Mpfr;
 
     #[inline]
-    fn neg(mut self) -> Self::Output {
+    fn neg(mut self) -> Self {
         unsafe { mpfr_neg(&mut self.mpfr, &self.mpfr, MpfrRnd::HalfToEven); }
         self
     }
 }
 
 impl fp::Abs for Mpfr {
-    type Output = Mpfr;
-
     #[inline]
-    fn abs(mut self) -> Self::Output {
+    fn abs(mut self) -> Self {
         unsafe { mpfr_abs(&mut self.mpfr, &self.mpfr, MpfrRnd::HalfToEven); }
         self
     }
 }
 
-impl fp::Add<Mpfr> for Mpfr {
-    type Output = Mpfr;
-
+impl fp::Add for Mpfr {
     #[inline]
-    fn add_lo(mut self, rhs: Mpfr) -> Self::Output {
+    fn add_lo(mut self, rhs: Self) -> Self {
         assert_eq!(self.precision(), rhs.precision());
         unsafe { mpfr_add(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::Down); }
         self
     }
 
     #[inline]
-    fn add_hi(mut self, rhs: Mpfr) -> Self::Output {
+    fn add_hi(mut self, rhs: Self) -> Self {
         assert_eq!(self.precision(), rhs.precision());
         unsafe { mpfr_add(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::Up); }
         self
     }
 }
 
-impl fp::Sub<Mpfr> for Mpfr {
-    type Output = Mpfr;
-
+impl fp::Sub for Mpfr {
     #[inline]
-    fn sub_lo(mut self, rhs: Mpfr) -> Self::Output {
+    fn sub_lo(mut self, rhs: Self) -> Self {
         assert_eq!(self.precision(), rhs.precision());
         unsafe { mpfr_sub(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::Down); }
         self
     }
 
     #[inline]
-    fn sub_hi(mut self, rhs: Mpfr) -> Self::Output {
+    fn sub_hi(mut self, rhs: Self) -> Self {
         assert_eq!(self.precision(), rhs.precision());
         unsafe { mpfr_sub(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::Up); }
         self
     }
 }
 
-impl fp::Mul<Mpfr> for Mpfr {
-    type Output = Mpfr;
-
+impl fp::Mul for Mpfr {
     #[inline]
-    fn mul_lo(mut self, rhs: Mpfr) -> Self::Output {
+    fn mul_lo(mut self, rhs: Self) -> Self {
         assert_eq!(self.precision(), rhs.precision());
         unsafe { mpfr_mul(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::Down); }
         self
     }
 
     #[inline]
-    fn mul_hi(mut self, rhs: Mpfr) -> Self::Output {
+    fn mul_hi(mut self, rhs: Self) -> Self {
         assert_eq!(self.precision(), rhs.precision());
         unsafe { mpfr_mul(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::Up); }
         self
     }
 }
 
-impl fp::Div<Mpfr> for Mpfr {
-    type Output = Mpfr;
-
+impl fp::Div for Mpfr {
     #[inline]
-    fn div_lo(mut self, rhs: Mpfr) -> Self::Output {
+    fn div_lo(mut self, rhs: Self) -> Self {
         assert_eq!(self.precision(), rhs.precision());
         unsafe { mpfr_div(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::Down); }
         self
     }
 
     #[inline]
-    fn div_hi(mut self, rhs: Mpfr) -> Self::Output {
+    fn div_hi(mut self, rhs: Self) -> Self {
         assert_eq!(self.precision(), rhs.precision());
         unsafe { mpfr_div(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::Up); }
         self
@@ -155,41 +141,39 @@ impl fp::Div<Mpfr> for Mpfr {
 }
 
 impl fp::Transc for Mpfr {
-    type Output = Self;
-
     #[inline]
-    fn log_lo(mut self) -> Self::Output {
+    fn log_lo(mut self) -> Self {
         unsafe { mpfr_log(&mut self.mpfr, &self.mpfr, MpfrRnd::Down); }
         self
     }
 
 
     #[inline]
-    fn log_hi(mut self) -> Self::Output {
+    fn log_hi(mut self) -> Self {
         unsafe { mpfr_log(&mut self.mpfr, &self.mpfr, MpfrRnd::Up); }
         self
     }
 
     #[inline]
-    fn exp_lo(mut self) -> Self::Output {
+    fn exp_lo(mut self) -> Self {
         unsafe { mpfr_exp(&mut self.mpfr, &self.mpfr, MpfrRnd::Down); }
         self
     }
 
 
     #[inline]
-    fn exp_hi(mut self) -> Self::Output {
+    fn exp_hi(mut self) -> Self {
         unsafe { mpfr_exp(&mut self.mpfr, &self.mpfr, MpfrRnd::Up); }
         self
     }
 
-    fn pow_lo(mut self, rhs: Self) -> Self::Output {
+    fn pow_lo(mut self, rhs: Self) -> Self {
         assert_eq!(self.precision(), rhs.precision());
         unsafe { mpfr_pow(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::Down); }
         self
     }
 
-    fn pow_hi(mut self, rhs: Self) -> Self::Output {
+    fn pow_hi(mut self, rhs: Self) -> Self {
         assert_eq!(self.precision(), rhs.precision());
         unsafe { mpfr_pow(&mut self.mpfr, &self.mpfr, &rhs.mpfr, MpfrRnd::Up); }
         self
