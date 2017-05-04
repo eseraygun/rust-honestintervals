@@ -1,4 +1,4 @@
-// TODO #![deny(missing_docs)]
+#![deny(missing_docs)]
 
 //! Honest Intervals is an interval arithmetic library with correct rounding.
 //!
@@ -34,6 +34,10 @@ pub mod transc;
 /// module defines `mpfr::Mpfr` struct which implements `fp::Float` using GNU MPFR.
 pub mod mpfr;
 
+/// A naive implementation of `fp::Float` for f64.
+///
+/// Default rounding mode is used for all operations. Therefore, the actual results may be outside
+/// of the lower and upper bounds. Use only when accuracy is not critical.
 pub mod ieee;
 
 /// Interval module.
