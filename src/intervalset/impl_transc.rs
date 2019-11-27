@@ -1,7 +1,7 @@
 use super::def::IntervalSet;
 
-use fp::Float;
-use transc::Transc;
+use crate::fp::Float;
+use crate::transc::Transc;
 
 impl<BOUND: Float> Transc for IntervalSet<BOUND> {
     type Output = Self;

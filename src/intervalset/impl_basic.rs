@@ -1,7 +1,7 @@
 use super::def::{IntervalSet, ParseIntervalSetError};
 
-use fp::Float;
-use interval::Interval;
+use crate::fp::Float;
+use crate::interval::Interval;
 
 use std::cmp::Ordering;
 use std::fmt;

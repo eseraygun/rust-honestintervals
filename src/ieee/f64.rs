@@ -1,6 +1,6 @@
-use fp;
+use crate::fp;
 use fp::{Float, Sign};
-use transc::Transc;
+use crate::transc::Transc;
 
 use std::f64;
 

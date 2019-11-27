@@ -1,6 +1,6 @@
 use super::def::Interval;
 
-use fp::Float;
+use crate::fp::Float;
 
 impl<BOUND: Float> PartialEq for Interval<BOUND> {
     #[inline]

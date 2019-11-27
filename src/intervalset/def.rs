@@ -1,4 +1,4 @@
-use interval::Interval;
+use crate::interval::Interval;
 
 /// Interval set parsing error enum.
 #[derive(Debug)]

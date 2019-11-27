@@ -1,6 +1,6 @@
 use super::def::{Interval, ParseIntervalError, SignClass};
 
-use fp::{Float, Sign};
+use crate::fp::{Float, Sign};
 
 use std::fmt;
 use std::fmt::{Display, Formatter, Write};

@@ -9,6 +9,11 @@ readme = "README.md"
 keywords = ["interval-arithmetic", "correct-rounding", "arbitrary-precision", "mpfr"]
 categories = ["algorithms", "api-bindings", "data-structures", "science"]
 license = "Apache-2.0"
+edition = "2018"
+
+[features]
+mpfr = ["libc"]
+jack_drv = []
 
 [dependencies]
-libc = "0.*"
+libc = {version="0.*", optional = true}
