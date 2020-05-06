@@ -15,6 +15,6 @@ impl<BOUND: Float> Transc for IntervalSet<BOUND> {
     }
 
      fn pow(self, rhs: Self) -> Self::Output {
-        self.binary_op(rhs, |i, j| i.pow_multi(j))
+        self.binary_op(rhs, |i, j| i.math_pow(j))
     }
 }
