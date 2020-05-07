@@ -15,8 +15,6 @@
 //! abstract basis for all possible implementations. Users do not have to implement any traits; they
 //! can create a correctly rounding interval right away by calling `IntervalSet::<Mpfr>::new()`.
 
-extern crate libc;
-
 /// Finite precision module.
 ///
 /// This module defines `fp::Float` trait and related traits where the floating point operations can
@@ -28,12 +26,14 @@ pub mod fp;
 /// This module defines transcendental functions such as `log` and `exp`.
 pub mod transc;
 
+
 /// MPFR wrapper module.
 ///
 /// GNU MPFR is a C library that provides arbitrary precision floating-point functionality. This
 /// module defines `mpfr::Mpfr` struct which implements `fp::Float` using GNU MPFR.
 #[cfg(not(feature = "no-mpfr"))]
 pub mod mpfr;
+
 
 /// A naive implementation of `fp::Float` for f64.
 ///
@@ -54,7 +54,9 @@ pub mod intervalset;
 pub use interval::{Interval, ParseIntervalError, SignClass};
 pub use intervalset::{IntervalSet, ParseIntervalSetError};
 
+
 #[cfg(test)]
+#[cfg(mpfr)]
 mod tests {
     #[test]
     fn test_quick_start() {

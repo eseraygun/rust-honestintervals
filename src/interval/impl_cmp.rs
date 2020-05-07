@@ -1,7 +1,7 @@
 use super::def::Interval;
 use std::cmp::Ordering;
 
-use fp::Float;
+use crate::fp::Float;
 
 impl<BOUND: Float> PartialEq for Interval<BOUND> {
     #[inline]

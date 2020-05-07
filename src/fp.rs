@@ -1,4 +1,4 @@
-use transc;
+use crate::transc;
 
 use std::fmt::Display;
 use std::convert;
@@ -19,17 +19,17 @@ pub enum Sign {
 /// Finite precision version of the `std::convert::From` trait.
 pub trait From<T> {
     /// Converts `T` into `Self` and rounds down inexact representations.
-    fn from_lo(T, precision: usize) -> Self;
+    fn from_lo(s: T, precision: usize) -> Self;
     /// Converts `T` into `Self` and rounds up inexact representations.
-    fn from_hi(T, precision: usize) -> Self;
+    fn from_hi(s: T, precision: usize) -> Self;
 }
 
 /// Finite precision version of the `std::str::FromStr` trait.
 pub trait FromStr: Sized + str::FromStr {
     /// Parses `Self` and rounds down inexact representations.
-    fn from_str_lo(s: &str, usize) -> Result<Self, Self::Err> { Self::from_str(s) }
+    fn from_str_lo(s: &str, _: usize) -> Result<Self, Self::Err> { Self::from_str(s) }
     /// Parses `Self` and rounds up inexact representations.
-    fn from_str_hi(s: &str, usize) -> Result<Self, Self::Err> { Self::from_str(s) }
+    fn from_str_hi(s: &str, _: usize) -> Result<Self, Self::Err> { Self::from_str(s) }
 }
 
 /// Finite precision version of the `std::convert::Into` trait.

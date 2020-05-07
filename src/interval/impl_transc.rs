@@ -1,7 +1,7 @@
 use super::def::{Interval, SignClass};
 
-use fp::Float;
-use transc::Transc;
+use crate::fp::Float;
+use crate::transc::Transc;
 
 impl<BOUND: Float> Interval<BOUND> {
     fn pow_p_p_multi(self, rhs: Self) -> Vec<Self> {
