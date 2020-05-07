@@ -26,7 +26,7 @@ impl<BOUND: Float> Transc for IntervalSet<BOUND> {
         Self::from_intervals(self.intervals.drain(..).map(|i| i.cos()).collect())
     }
 
-    fn tan(mut self) -> Self::Output {
+    fn tan(self) -> Self::Output {
         self.clone().sin() / self.cos()
     }
 }

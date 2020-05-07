@@ -81,9 +81,13 @@ extern "C" {
     pub fn mpfr_div(rop: MpfrPtr, op1: MpfrConstPtr, op2: MpfrConstPtr, rnd: MpfrRnd) -> c_int;
     pub fn mpfr_pow(rop: MpfrPtr, op1: MpfrConstPtr, op2: MpfrConstPtr, rnd: MpfrRnd) -> c_int;
 
+
     // Special functions.
     pub fn mpfr_log(rop: MpfrPtr, op: MpfrConstPtr, rnd: MpfrRnd) -> c_int;
     pub fn mpfr_exp(rop: MpfrPtr, op: MpfrConstPtr, rnd: MpfrRnd) -> c_int;
+    pub fn mpfr_sin(rop: MpfrPtr, op: MpfrConstPtr, rnd: MpfrRnd) -> c_int;
+    pub fn mpfr_cos(rop: MpfrPtr, op: MpfrConstPtr, rnd: MpfrRnd) -> c_int;
+    pub fn mpfr_tan(rop: MpfrPtr, op: MpfrConstPtr, rnd: MpfrRnd) -> c_int;
 
     // Miscellaneous Functions
     pub fn mpfr_min(rop: MpfrPtr, op1: MpfrConstPtr, op2: MpfrConstPtr, rnd: MpfrRnd) -> c_int;
