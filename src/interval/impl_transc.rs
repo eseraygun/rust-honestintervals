@@ -56,14 +56,29 @@ impl<BOUND: Float> Interval<BOUND> {
         assert!(self.sign_class().is_negative());
 
         let mut intervals = Vec::<Self>::new();
-        let mut neg_intervals = (-self).pow_p_a_multi(rhs);
-        intervals.append(&mut neg_intervals.iter().map(|i| -i.clone()).collect());
-        intervals.append(&mut neg_intervals);
+
+        if rhs.is_singleton() {
+            let exponent: f64 = rhs.clone().lo.into_lo();
+            if exponent.round() == exponent {
+                let exponent: u64 = exponent.round() as u64;
+                let mut neg_intervals = (-self).pow_p_a_multi(rhs.clone());
+                if exponent % 2 == 0 {
+                    // even integer exponent
+                    intervals.append(&mut neg_intervals);
+                } else {
+                    // odd integer exponent
+                    intervals.append(&mut neg_intervals.iter().map(|i| -i.clone()).collect());
+                }
+            }
+        }
+
         intervals
     }
 
     /// Computes `self` raised to the power `rhs` and returns a vector of intervals minimally
     /// covering the result.
+    /// If `self` is negative and `rhs` is an even/odd integer number then positive/negative intervals are returned.
+    /// If `self` is negative and `rhs` is not integer an empty set is returned.
     pub fn pow_multi(self, rhs: Self) -> Vec<Self> {
         let precision = self.precision();
 
@@ -89,41 +104,6 @@ impl<BOUND: Float> Interval<BOUND> {
             intervals.append(&mut self_n.pow_n_a_multi(rhs));
         }
         intervals
-    }
-
-    /// Computes `self` raised to the power `rhs`. 
-    /// If `self` is negative and `rhs` is an even/odd integer number then positive/negative intervals are returned.
-    /// If `self` is negative and `rhs` is not integer an empty set is returned.
-    pub fn math_pow(self, rhs: Self) -> Vec<Self> {
-        let precision = self.precision();
-        if self > Interval::singleton(BOUND::zero(precision)) {
-            return self.pow_multi(rhs);
-        } else if self.is_zero() {
-            return vec![self];
-        } else if rhs.is_singleton() {
-            let exponent: f64 = rhs.clone().lo.into_lo();
-            if exponent.round() == exponent {
-                // is integer
-                let exponent: u64 = exponent.round() as u64;
-                let pow_multi = self.pow_multi(rhs);
-                let mut res: Vec<Interval<BOUND>> = Vec::new();
-                if exponent % 2 == 0 {
-                    for x in pow_multi {
-                        if x > Interval::singleton(BOUND::zero(precision)) {
-                            res.push(x)
-                        }
-                    }
-                } else {
-                    for x in pow_multi {
-                        if x < Interval::singleton(BOUND::zero(precision)) {
-                            res.push(x)
-                        }
-                    }
-                }
-                return res;
-            }
-        }
-        return vec![] // negative floating point exponent
     }
 }
 
