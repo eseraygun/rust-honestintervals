@@ -32,6 +32,7 @@ pub mod transc;
 ///
 /// GNU MPFR is a C library that provides arbitrary precision floating-point functionality. This
 /// module defines `mpfr::Mpfr` struct which implements `fp::Float` using GNU MPFR.
+#[cfg(not(feature = "no-mpfr"))]
 pub mod mpfr;
 
 /// A naive implementation of `fp::Float` for f64.
