@@ -1,6 +1,6 @@
 use super::IntervalSet;
 
-use mpfr::Mpfr;
+use crate::mpfr::Mpfr;
 
 type B = Mpfr;
 type IVS = IntervalSet<B>;
@@ -318,7 +318,7 @@ fn test_div() {
 
 #[test]
 fn test_log() {
-    use transc::Transc;
+    use crate::transc::Transc;
     test_unary_op(IVS::log, all_sign_classes_small_and_big(), vec![
         ("nan", "{}"),
         ("whl", "<-inf, inf>"),
@@ -339,7 +339,7 @@ fn test_log() {
 
 #[test]
 fn test_exp() {
-    use transc::Transc;
+    use crate::transc::Transc;
     test_unary_op(IVS::exp, all_sign_classes_small_and_big(), vec![
         ("nan", "{}"),
         ("whl", "<0, inf>"),

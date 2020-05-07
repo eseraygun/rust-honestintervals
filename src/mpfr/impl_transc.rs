@@ -1,7 +1,7 @@
 use super::capi::*;
 use super::def::Mpfr;
 
-use transc::Transc;
+use crate::transc::Transc;
 
 impl Mpfr {
     #[inline]

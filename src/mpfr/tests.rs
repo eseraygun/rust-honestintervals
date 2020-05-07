@@ -8,8 +8,8 @@ macro_rules! assert_str_eq {
 }
 
 macro_rules! mpfr {
-    ($v:expr) => { ::mpfr::Mpfr::from_str_with_prec($v, PREC).unwrap() };
-    ($v:expr, $p:expr) => { ::mpfr::Mpfr::from_str_with_prec($v, $p).unwrap() };
+    ($v:expr) => { crate::mpfr::Mpfr::from_str_with_prec($v, PREC).unwrap() };
+    ($v:expr, $p:expr) => { crate::mpfr::Mpfr::from_str_with_prec($v, $p).unwrap() };
 }
 
 #[test]
@@ -109,7 +109,7 @@ fn test_partial_ord_rest() {
 
 #[test]
 fn test_from_lo() {
-    use fp::From;
+    use crate::fp::From;
     use std::f64;
     assert_str_eq!("0", Mpfr::from_lo(0f64, PREC));
     assert_str_eq!("0.75", Mpfr::from_lo(0.9, PREC));
@@ -123,7 +123,7 @@ fn test_from_lo() {
 
 #[test]
 fn test_from_hi() {
-    use fp::From;
+    use crate::fp::From;
     use std::f64;
     assert_str_eq!("0", Mpfr::from_hi(0f64, PREC));
     assert_str_eq!("1", Mpfr::from_hi(0.9, PREC));
@@ -137,7 +137,7 @@ fn test_from_hi() {
 
 #[test]
 fn test_from_str_lo() {
-    use fp::FromStr;
+    use crate::fp::FromStr;
     assert_str_eq!("0", Mpfr::from_str_lo("0", PREC).unwrap());
     assert_str_eq!("0.75", Mpfr::from_str_lo("0.9", PREC).unwrap());
     assert_str_eq!("1", Mpfr::from_str_lo("1.1", PREC).unwrap());
@@ -150,7 +150,7 @@ fn test_from_str_lo() {
 
 #[test]
 fn test_from_str_hi() {
-    use fp::FromStr;
+    use crate::fp::FromStr;
     assert_str_eq!("0", Mpfr::from_str_hi("0", PREC).unwrap());
     assert_str_eq!("1", Mpfr::from_str_hi("0.9", PREC).unwrap());
     assert_str_eq!("1.5", Mpfr::from_str_hi("1.1", PREC).unwrap());
@@ -163,7 +163,7 @@ fn test_from_str_hi() {
 
 #[test]
 fn test_into_lo_f64() {
-    use fp::Into;
+    use crate::fp::Into;
     use std::f64;
     assert_eq!(0.9999999999999999, mpfr!("0.99999999999999999", 113).into_lo());
     assert_eq!(1.0, mpfr!("1.0000000000000001", 113).into_lo());
@@ -176,7 +176,7 @@ fn test_into_lo_f64() {
 
 #[test]
 fn test_into_hi_f64() {
-    use fp::Into;
+    use crate::fp::Into;
     use std::f64;
     assert_eq!(1.0, mpfr!("0.99999999999999999", 113).into_hi());
     assert_eq!(1.0000000000000002, mpfr!("1.0000000000000001", 113).into_hi());
@@ -189,14 +189,14 @@ fn test_into_hi_f64() {
 
 #[test]
 fn test_min() {
-    use fp::MinMax;
+    use crate::fp::MinMax;
     assert_str_eq!("0", mpfr!("0").min(mpfr!("1")));
     assert_str_eq!("0", mpfr!("1").min(mpfr!("0")));
 }
 
 #[test]
 fn test_max() {
-    use fp::MinMax;
+    use crate::fp::MinMax;
     assert_str_eq!("1", mpfr!("0").max(mpfr!("1")));
     assert_str_eq!("1", mpfr!("1").max(mpfr!("0")));
 }
@@ -211,7 +211,7 @@ fn test_neg() {
 
 #[test]
 fn test_abs() {
-    use fp::Abs;
+    use crate::fp::Abs;
     assert_str_eq!("0", mpfr!("0").abs());
     assert_str_eq!("1", mpfr!("1").abs());
     assert_str_eq!("1", mpfr!("-1").abs());
@@ -219,105 +219,105 @@ fn test_abs() {
 
 #[test]
 fn test_add_lo() {
-    use fp::Add;
+    use crate::fp::Add;
     assert_str_eq!("1.5", mpfr!("0.75").add_lo(mpfr!("1")));
     assert_str_eq!("-2", mpfr!("-0.75").add_lo(mpfr!("-1")));
 }
 
 #[test]
 fn test_add_hi() {
-    use fp::Add;
+    use crate::fp::Add;
     assert_str_eq!("2", mpfr!("0.75").add_hi(mpfr!("1")));
     assert_str_eq!("-1.5", mpfr!("-0.75").add_hi(mpfr!("-1")));
 }
 
 #[test]
 fn test_sub_lo() {
-    use fp::Sub;
+    use crate::fp::Sub;
     assert_str_eq!("1.5", mpfr!("0.75").sub_lo(mpfr!("-1")));
     assert_str_eq!("-2", mpfr!("-0.75").sub_lo(mpfr!("1")));
 }
 
 #[test]
 fn test_sub_hi() {
-    use fp::Sub;
+    use crate::fp::Sub;
     assert_str_eq!("2", mpfr!("0.75").sub_hi(mpfr!("-1")));
     assert_str_eq!("-1.5", mpfr!("-0.75").sub_hi(mpfr!("1")));
 }
 
 #[test]
 fn test_mul_lo() {
-    use fp::Mul;
+    use crate::fp::Mul;
     assert_str_eq!("2", mpfr!("0.75").mul_lo(mpfr!("3")));
     assert_str_eq!("-3", mpfr!("-0.75").mul_lo(mpfr!("3")));
 }
 
 #[test]
 fn test_mul_hi() {
-    use fp::Mul;
+    use crate::fp::Mul;
     assert_str_eq!("3", mpfr!("0.75").mul_hi(mpfr!("3")));
     assert_str_eq!("-2", mpfr!("-0.75").mul_hi(mpfr!("3")));
 }
 
 #[test]
 fn test_div_lo() {
-    use fp::Div;
+    use crate::fp::Div;
     assert_str_eq!("0.5", mpfr!("2").div_lo(mpfr!("3")));
     assert_str_eq!("-0.75", mpfr!("-2").div_lo(mpfr!("3")));
 }
 
 #[test]
 fn test_div_hi() {
-    use fp::Div;
+    use crate::fp::Div;
     assert_str_eq!("0.75", mpfr!("2").div_hi(mpfr!("3")));
     assert_str_eq!("-0.5", mpfr!("-2").div_hi(mpfr!("3")));
 }
 
 #[test]
 fn test_log_lo() {
-    use fp::Transc;
+    use crate::fp::Transc;
     assert_str_eq!("0", mpfr!("1").log_lo());
     assert_str_eq!("0.5", mpfr!("2").log_lo());
 }
 
 #[test]
 fn test_log_hi() {
-    use fp::Transc;
+    use crate::fp::Transc;
     assert_str_eq!("0", mpfr!("1").log_hi());
     assert_str_eq!("0.75", mpfr!("2").log_hi());
 }
 
 #[test]
 fn test_exp_lo() {
-    use fp::Transc;
+    use crate::fp::Transc;
     assert_str_eq!("2", mpfr!("1").exp_lo());
     assert_str_eq!("6", mpfr!("2").exp_lo());
 }
 
 #[test]
 fn test_exp_hi() {
-    use fp::Transc;
+    use crate::fp::Transc;
     assert_str_eq!("3", mpfr!("1").exp_hi());
     assert_str_eq!("8", mpfr!("2").exp_hi());
 }
 
 #[test]
 fn test_pow_lo() {
-    use fp::Transc;
+    use crate::fp::Transc;
     assert_str_eq!("1", mpfr!("1").pow_lo(mpfr!("1.5")));
     assert_str_eq!("0.5", mpfr!("0.5").pow_lo(mpfr!("0.75")));
 }
 
 #[test]
 fn test_pow_hi() {
-    use fp::Transc;
+    use crate::fp::Transc;
     assert_str_eq!("1", mpfr!("1").pow_hi(mpfr!("1.5")));
     assert_str_eq!("0.75", mpfr!("0.5").pow_hi(mpfr!("0.75")));
 }
 
 #[test]
 fn test_constants() {
-    use fp::Float;
+    use crate::fp::Float;
     assert_str_eq!("0", Mpfr::zero(PREC));
     assert_str_eq!("inf", Mpfr::one(PREC) / Mpfr::zero(PREC));
     assert_str_eq!("0", Mpfr::neg_zero(PREC));
@@ -330,7 +330,7 @@ fn test_constants() {
 
 #[test]
 fn test_is_finite() {
-    use fp::Float;
+    use crate::fp::Float;
     assert!(mpfr!("0").is_finite());
     assert!(mpfr!("1").is_finite());
     assert!(!mpfr!("inf").is_finite());
@@ -340,7 +340,7 @@ fn test_is_finite() {
 
 #[test]
 fn test_is_infinite() {
-    use fp::Float;
+    use crate::fp::Float;
     assert!(!mpfr!("0").is_infinite());
     assert!(!mpfr!("1").is_infinite());
     assert!(mpfr!("inf").is_infinite());
@@ -350,7 +350,7 @@ fn test_is_infinite() {
 
 #[test]
 fn test_is_zero() {
-    use fp::Float;
+    use crate::fp::Float;
     assert!(mpfr!("0").is_zero());
     assert!(!mpfr!("1").is_zero());
     assert!(!mpfr!("inf").is_zero());
@@ -360,7 +360,7 @@ fn test_is_zero() {
 
 #[test]
 fn test_is_infinity() {
-    use fp::Float;
+    use crate::fp::Float;
     assert!(!mpfr!("0").is_infinity());
     assert!(!mpfr!("1").is_infinity());
     assert!(mpfr!("inf").is_infinity());
@@ -370,7 +370,7 @@ fn test_is_infinity() {
 
 #[test]
 fn test_is_neg_infinity() {
-    use fp::Float;
+    use crate::fp::Float;
     assert!(!mpfr!("0").is_neg_infinity());
     assert!(!mpfr!("1").is_neg_infinity());
     assert!(!mpfr!("inf").is_neg_infinity());
@@ -380,7 +380,7 @@ fn test_is_neg_infinity() {
 
 #[test]
 fn test_is_nan() {
-    use fp::Float;
+    use crate::fp::Float;
     assert!(!mpfr!("0").is_nan());
     assert!(!mpfr!("1").is_nan());
     assert!(!mpfr!("inf").is_nan());

@@ -1,6 +1,8 @@
 use super::Interval;
 
-use mpfr::Mpfr;
+use crate::mpfr::Mpfr;
+use crate::fp;
+use crate::transc;
 
 type B = Mpfr;
 type IV = Interval<B>;

@@ -1,7 +1,7 @@
 use super::capi::*;
 use super::def::{Mpfr, ParseMpfrError};
 
-use fp::Float;
+use crate::fp::Float;
 
 use std::ffi::CString;
 use std::fmt;

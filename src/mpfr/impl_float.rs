@@ -1,7 +1,7 @@
 use super::capi::*;
 use super::def::Mpfr;
 
-use fp;
+use crate::fp;
 use fp::{Float, Sign};
 
 use std::ops::Neg;
