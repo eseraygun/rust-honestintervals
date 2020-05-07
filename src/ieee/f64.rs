@@ -15,7 +15,12 @@ impl Transc for f64 {
 
     #[inline]
     fn pow(self, rhs: Self) -> Self::Output { self.powf(rhs) }
-}
+
+    #[inline]
+    fn sin(self) -> Self::Output { self.sin() }
+
+    #[inline]
+    fn cos(self) -> Self::Output { self.cos() }}
 
 impl fp::From<f64> for f64 {
     #[inline]

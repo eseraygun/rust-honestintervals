@@ -40,4 +40,13 @@ impl Transc for Mpfr {
     fn pow(self, rhs: Self) -> Self::Output {
         self.pow_custom(rhs, MpfrRnd::HalfToEven)
     }
-}
+
+    #[inline]
+    fn sin(self) -> Self::Output {
+        unimplemented!()
+    }
+
+    #[inline]
+    fn cos(self) -> Self::Output {
+        unimplemented!()
+    }}

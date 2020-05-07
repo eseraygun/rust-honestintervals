@@ -17,4 +17,12 @@ impl<BOUND: Float> Transc for IntervalSet<BOUND> {
     fn pow(self, rhs: Self) -> Self::Output {
         self.binary_op(rhs, |i, j| i.pow_multi(j))
     }
+
+    fn sin(mut self) -> Self::Output {
+        Self::from_intervals(self.intervals.drain(..).map(|i| i.sin()).collect())
+    }
+
+    fn cos(mut self) -> Self::Output {
+        Self::from_intervals(self.intervals.drain(..).map(|i| i.cos()).collect())
+    }
 }

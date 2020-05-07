@@ -1,5 +1,7 @@
 use super::def::{Interval, SignClass};
 
+use std::f64;
+
 use crate::fp::Float;
 use crate::transc::Transc;
 
@@ -139,5 +141,84 @@ impl<BOUND: Float> Transc for Interval<BOUND> {
     fn pow(self, rhs: Self) -> Self::Output {
         let precision = self.precision();
         Self::minimal_cover(self.pow_multi(rhs), precision)
+    }
+
+    fn sin(self) -> Self::Output {
+
+        let sin_lo = self.lo.clone().into_hi().sin();
+        let sin_hi = self.hi.clone().into_hi().sin();
+
+        let mut max_val;
+        let mut min_val;
+
+        if sin_lo < sin_hi {
+            max_val = sin_hi;
+            min_val = sin_lo;
+        } else {
+            max_val = sin_lo;
+            min_val = sin_hi;
+        }
+
+        // We want to determine whether there is a k such that
+        // self.lo <= pi/2 + 2kpi <= self.hi
+        // In this case the maximum is 1
+        let k_max = (self.hi.clone().into_hi() / (2.0 * f64::consts::PI) - 0.25).floor();
+
+        if k_max >= self.lo.clone().into_hi() / (2.0 * f64::consts::PI) - 0.25 {
+            max_val = 1.0;
+        }
+
+        // We want to determine whether there is a k such that
+        // self.lo <= (3pi)/2 + 2kpi <= self.hi
+        // In this case the minimum is -1
+        let k_min = (self.hi.clone().into_hi() / (2.0 * f64::consts::PI) - (3.0 / 4.0)).floor();
+
+        if k_min >= self.lo.clone().into_hi() / (2.0 * f64::consts::PI) - (3.0 / 4.0) {
+            min_val = -1.0;
+        }
+
+        // If neither of those cases happens, the function can be considered monotonic
+        // so we are just happy to know only the values of self.hi and self.lo
+
+        Interval::new(min_val.into(), max_val.into())
+
+    }
+
+    fn cos(self) -> Self::Output {
+
+        let cos_lo = self.lo.clone().into_hi().cos();
+        let cos_hi = self.hi.clone().into_hi().cos();
+
+        let mut max_val;
+        let mut min_val;
+
+        if cos_lo < cos_hi {
+            max_val = cos_hi;
+            min_val = cos_lo;
+        } else {
+            max_val = cos_lo;
+            min_val = cos_hi;
+        }
+
+        // We want to determine whether there is a k such that
+        // self.lo <= 2kpi <= self.hi
+        // In this case the maximum is 1
+        let k_max = (self.hi.clone().into_hi() / (2.0 * f64::consts::PI)).floor();
+
+        if k_max >= self.lo.clone().into_hi() / (2.0 * f64::consts::PI) {
+            max_val = 1.0;
+        }
+
+        // We want to determine whether there is a k such that
+        // self.lo <= pi + 2kpi <= self.hi
+        // In this case the minimum is -1
+        let k_min = (self.hi.clone().into_hi() / (2.0 * f64::consts::PI) - 0.5).floor();
+
+        if k_min >= self.lo.clone().into_hi() / (2.0 * f64::consts::PI) - 0.5 {
+            min_val = -1.0;
+        }
+
+        Interval::new(min_val.into(), max_val.into())
+
     }
 }

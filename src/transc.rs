@@ -8,4 +8,10 @@ pub trait Transc<RHS=Self> {
     fn exp(self) -> Self::Output;
     /// Computes `self` raised to the power `rhs`.
     fn pow(self, rhs: RHS) -> Self::Output;
+
+    /// Computer the sin of `self`.
+    fn sin(self) -> Self::Output;
+
+    /// Computer the cos of `self`.
+    fn cos(self) -> Self::Output;
 }
