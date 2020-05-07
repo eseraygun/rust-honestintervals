@@ -14,4 +14,7 @@ pub trait Transc<RHS=Self> {
 
     /// Computer the cos of `self`.
     fn cos(self) -> Self::Output;
+
+    /// Computer the tan of `self`.
+    fn tan(self) -> Self::Output;
 }

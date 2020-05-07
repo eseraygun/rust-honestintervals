@@ -221,4 +221,8 @@ impl<BOUND: Float> Transc for Interval<BOUND> {
         Interval::new(min_val.into(), max_val.into())
 
     }
+
+    fn tan(self) -> Self::Output {
+        self.clone().sin() / self.cos()
+    }
 }

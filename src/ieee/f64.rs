@@ -20,7 +20,11 @@ impl Transc for f64 {
     fn sin(self) -> Self::Output { self.sin() }
 
     #[inline]
-    fn cos(self) -> Self::Output { self.cos() }}
+    fn cos(self) -> Self::Output { self.cos() }
+
+    #[inline]
+    fn tan(self) -> Self::Output { self.tan() }
+}
 
 impl fp::From<f64> for f64 {
     #[inline]
