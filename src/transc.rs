@@ -12,9 +12,18 @@ pub trait Transc<RHS=Self> {
     /// Computer the sin of `self`.
     fn sin(self) -> Self::Output;
 
-    /// Computer the cos of `self`.
+    /// Computes the cos of `self`.
     fn cos(self) -> Self::Output;
 
-    /// Computer the tan of `self`.
+    /// Computes the tan of `self`.
     fn tan(self) -> Self::Output;
+
+    /// Computes the sqrt of `self`.
+    fn sqrt(self) -> Self::Output;
+
+    /// Computes the abs of `self`.
+    fn abs(self) -> Self::Output;
+
+    /// Computes the sign of `self`.
+    fn signum(self) -> Self::Output;
 }

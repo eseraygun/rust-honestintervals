@@ -166,6 +166,18 @@ impl<BOUND: Float> IntervalSet<BOUND> {
         }
         Self::from_intervals(intervals)
     }
+
+    /// Performs a unary operation by performing it on all intervals of `self`
+    #[inline]
+    pub fn unary_op<OP>(self, op: OP) -> Self
+        where OP: Fn(Interval<BOUND>) -> Vec<Interval<BOUND>>
+    {
+        let mut intervals = Vec::<Interval<BOUND>>::new();
+        for i in &self.intervals {
+            intervals.append(&mut op(i.clone()));
+        }
+        Self::from_intervals(intervals)
+    }
 }
 
 impl<BOUND: Float> From<f64> for IntervalSet<BOUND> {

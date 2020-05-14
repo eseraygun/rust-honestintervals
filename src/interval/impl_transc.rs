@@ -107,6 +107,23 @@ impl<BOUND: Float> Interval<BOUND> {
         }
         intervals
     }
+
+    /// Computes signum of `self`
+    pub fn signum_multi(self) -> Vec<Self> {
+        let precision = self.precision();
+        match self.sign_class() {
+            SignClass::Positive(_) => vec![Self::one(precision)],
+            SignClass::Negative(_) => vec![-Self::one(precision)],
+            SignClass::Zero => vec![-Self::zero(precision)],
+            SignClass::Mixed => {
+                vec![
+                    Self::one(precision),
+                    -Self::one(precision),
+                    Self::zero(precision),
+                ]
+            },
+        }
+    }
 }
 
 impl<BOUND: Float> Transc for Interval<BOUND> {
@@ -224,5 +241,53 @@ impl<BOUND: Float> Transc for Interval<BOUND> {
 
     fn tan(self) -> Self::Output {
         self.clone().sin() / self.cos()
+    }
+
+    fn sqrt(self) -> Self::Output {
+        let precision = self.precision();
+
+        if self.is_nan() {
+            return self;
+        }
+        if self.is_zero() {
+            return self;
+        }
+
+        let (_, self_p) = self.split(BOUND::zero(precision));
+        if !self_p.is_nan() {
+            return Self::new(
+                self_p.lo.sqrt(),
+                self_p.hi.sqrt()
+            );
+        }
+        
+        return Self::nan(precision);
+    }
+
+    fn abs(self) -> Self::Output {
+        let precision = self.precision();
+        match self.sign_class() {
+            SignClass::Positive(_) => self,
+            SignClass::Negative(_) => {
+                Self::new(
+                    -self.hi,
+                    -self.lo
+                )
+            },
+            SignClass::Mixed => {
+                Self::new(
+                    BOUND::zero(precision),
+                    self.hi.max(-self.lo)
+                )
+            },
+            SignClass::Zero => {
+                self
+            }
+        }
+    }
+
+    fn signum(self) -> Self::Output {
+        let precision = self.precision();
+        Self::minimal_cover(self.signum_multi(), precision)
     }
 }

@@ -29,4 +29,16 @@ impl<BOUND: Float> Transc for IntervalSet<BOUND> {
     fn tan(self) -> Self::Output {
         self.clone().sin() / self.cos()
     }
+
+    fn sqrt(mut self) -> Self::Output {
+        Self::from_intervals(self.intervals.drain(..).map(|i| i.sqrt()).collect())
+    }
+
+    fn abs(mut self) -> Self::Output {
+        Self::from_intervals(self.intervals.drain(..).map(|i| i.abs()).collect())
+    }
+
+    fn signum(self) -> Self::Output {
+        self.unary_op(|x| x.signum_multi())
+    }
 }

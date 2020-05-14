@@ -24,6 +24,15 @@ impl Transc for f64 {
 
     #[inline]
     fn tan(self) -> Self::Output { self.tan() }
+
+    #[inline]
+    fn sqrt(self) -> Self::Output { self.sqrt() }
+
+    #[inline]
+    fn abs(self) -> Self::Output { self.abs() }
+
+    #[inline]
+    fn signum(self) -> Self::Output { self.signum() }
 }
 
 impl fp::From<f64> for f64 {

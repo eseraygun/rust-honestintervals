@@ -39,6 +39,24 @@ impl Mpfr {
         unsafe { mpfr_tan(&mut self.mpfr, &self.mpfr, rounding_mode); }
         self
     }
+
+    #[inline]
+    fn sqrt_custom(mut self, rounding_mode: MpfrRnd) -> Self {
+        unsafe { mpfr_sqrt(&mut self.mpfr, &self.mpfr, rounding_mode); }
+        self
+    }
+
+    #[inline]
+    fn abs_custom(mut self, rounding_mode: MpfrRnd) -> Self {
+        unsafe { mpfr_abs(&mut self.mpfr, &self.mpfr, rounding_mode); }
+        self
+    }
+
+    #[inline]
+    fn sgn_custom(self) -> Self {
+        unsafe { mpfr_sgn(&self.mpfr); }
+        self
+    }
 }
 
 impl Transc for Mpfr {
@@ -74,4 +92,18 @@ impl Transc for Mpfr {
         self.tan_custom(MpfrRnd::HalfToEven)
     }
 
+    #[inline]
+    fn sqrt(self) -> Self::Output {
+        self.sqrt_custom(MpfrRnd::HalfToEven)
+    }
+
+    #[inline]
+    fn abs(self) -> Self::Output {
+        self.abs_custom(MpfrRnd::HalfToEven)
+    }
+
+    #[inline]
+    fn signum(self) -> Self::Output {
+        self.sgn_custom()
+    }
 }

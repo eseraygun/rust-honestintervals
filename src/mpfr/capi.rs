@@ -79,6 +79,7 @@ extern "C" {
     pub fn mpfr_sub(rop: MpfrPtr, op1: MpfrConstPtr, op2: MpfrConstPtr, rnd: MpfrRnd) -> c_int;
     pub fn mpfr_mul(rop: MpfrPtr, op1: MpfrConstPtr, op2: MpfrConstPtr, rnd: MpfrRnd) -> c_int;
     pub fn mpfr_div(rop: MpfrPtr, op1: MpfrConstPtr, op2: MpfrConstPtr, rnd: MpfrRnd) -> c_int;
+    pub fn mpfr_sqrt(rop: MpfrPtr, op: MpfrConstPtr, rnd: MpfrRnd) -> c_int;
     pub fn mpfr_pow(rop: MpfrPtr, op1: MpfrConstPtr, op2: MpfrConstPtr, rnd: MpfrRnd) -> c_int;
 
 
