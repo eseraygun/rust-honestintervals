@@ -1,6 +1,6 @@
 use super::def::IntervalSet;
 
-use fp::Float;
+use crate::fp::Float;
 
 use std::ops::{Add, Div, Mul, Neg, Sub};
 

@@ -9,6 +9,10 @@ readme = "README.md"
 keywords = ["interval-arithmetic", "correct-rounding", "arbitrary-precision", "mpfr"]
 categories = ["algorithms", "api-bindings", "data-structures", "science"]
 license = "Apache-2.0"
+edition = "2018"
 
 [dependencies]
-libc = "0.*"
+libc = "0.2"
+
+[features]
+no-mpfr = [] # Does not include mpfr module 

@@ -87,7 +87,7 @@ fn test_sign_class() {
 
 #[test]
 fn test_precision() {
-    use fp::Float;
+    use crate::fp::Float;
     assert_eq!(53usize, IV::new(B::zero(53), B::zero(53)).precision());
 }
 

@@ -1,7 +1,7 @@
 use super::capi::*;
 use super::def::Mpfr;
 
-use fp::Float;
+use crate::fp::Float;
 
 use std::ops::{Add, Div, Mul, Sub};
 

@@ -1,7 +1,7 @@
 use super::def::{IntervalSet, ParseIntervalSetError};
 
-use fp::Float;
-use interval::Interval;
+use crate::fp::Float;
+use crate::interval::Interval;
 
 use std::cmp::Ordering;
 use std::fmt;
@@ -113,9 +113,9 @@ impl<BOUND: Float> IntervalSet<BOUND> {
             Ok(IntervalSet::from_interval(i))
         } else {
             if !s.starts_with('{') { return Err(ParseIntervalSetError::MissingOpeningBraces) }
-            let s = s.trim_left_matches('{').trim_left();
+            let s = s.trim_start_matches('{').trim_start();
             if !s.ends_with('}') { return Err(ParseIntervalSetError::MissingClosingBraces) }
-            let s = s.trim_right_matches('}').trim_right();
+            let s = s.trim_end_matches('}').trim_end();
             if s.is_empty() { return Ok(Self::empty()) }
             let mut results: Vec<_> = s.split(';')
                 .map(|v| v.trim())
@@ -163,6 +163,18 @@ impl<BOUND: Float> IntervalSet<BOUND> {
             for j in &rhs.intervals {
                 intervals.append(&mut op(i.clone(), j.clone()));
             }
+        }
+        Self::from_intervals(intervals)
+    }
+
+    /// Performs a unary operation by performing it on all intervals of `self`
+    #[inline]
+    pub fn unary_op<OP>(self, op: OP) -> Self
+        where OP: Fn(Interval<BOUND>) -> Vec<Interval<BOUND>>
+    {
+        let mut intervals = Vec::<Interval<BOUND>>::new();
+        for i in &self.intervals {
+            intervals.append(&mut op(i.clone()));
         }
         Self::from_intervals(intervals)
     }

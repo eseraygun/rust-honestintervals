@@ -1,6 +1,6 @@
 use super::def::{Interval, ParseIntervalError, SignClass};
 
-use fp::{Float, Sign};
+use crate::fp::{Float, Sign};
 
 use std::fmt;
 use std::fmt::{Display, Formatter, Write};
@@ -125,9 +125,9 @@ impl<BOUND: Float> Interval<BOUND> {
             Ok(Self::new(lo, hi))
         } else {
             if !s.starts_with('<') { return Err(ParseIntervalError::MissingOpeningBracket) }
-            let s = s.trim_left_matches('<').trim_left();
+            let s = s.trim_start_matches('<').trim_start();
             if !s.ends_with('>') { return Err(ParseIntervalError::MissingClosingBracket) }
-            let s = s.trim_right_matches('>').trim_right();
+            let s = s.trim_end_matches('>').trim_end();
             let p: Vec<&str> = s.split(',').collect();
             if p.len() == 2 {
                 let lo = BOUND::from_str_lo(p[0].trim(), precision);

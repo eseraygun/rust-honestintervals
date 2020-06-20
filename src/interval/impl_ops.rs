@@ -1,6 +1,6 @@
 use super::def::{Interval, SignClass};
 
-use fp::Float;
+use crate::fp::Float;
 
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
