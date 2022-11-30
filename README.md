@@ -13,12 +13,16 @@ sets. Bounds of the return values are always correctly rounded up or down to ens
 possible results are contained.
 
 In addition to the `Interval` and `IntervalSet` structs, the library also provides the `Mpfr`
-struct that wraps the GNU MPFR library. The `Mpfr` struct is an ideal (and currently only)
+struct that wraps [the GNU MPFR library](https://www.mpfr.org/). The `Mpfr` struct is an ideal (and currently only)
 bound type for intervals.
 
 Honest Intervals tries to be a pragmatic implementation of interval arithmetic rather than an
 abstract basis for all possible implementations. Users do not have to implement any traits; they
 can create a correctly rounding interval right away by calling `IntervalSet::<Mpfr>::new()`.
+
+## Dependencies
+
+Honest Intervals must be linked against [the GNU MPFR library](https://www.mpfr.org/).
 
 ## Quick Start
 
