@@ -1,6 +1,6 @@
 [package]
 name = "honestintervals"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["eser"]
 description = "Comprehensive, correctly rounding interval arithmetic library."
 documentation = "https://docs.rs/honestintervals/"
