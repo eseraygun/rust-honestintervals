@@ -1,4 +1,4 @@
-#![deny(missing_docs)]
+#![deny(warnings)]
 
 //! Honest Intervals is an interval arithmetic library with correct rounding.
 //!

@@ -289,10 +289,10 @@ fn test_into_pair() {
 
 #[test]
 fn test_partial_eq() {
-    assert!(iv!("NaN") == iv!("NaN"));
-    assert!(iv!("0") == iv!("0"));
-    assert!(iv!("<0, 1>") == iv!("<0, 1>"));
-    assert!(iv!("<0, 1>") != iv!("<0, 2>"));
+    assert_eq!(iv!("NaN"), iv!("NaN"));
+    assert_eq!(iv!("0"), iv!("0"));
+    assert_eq!(iv!("<0, 1>"), iv!("<0, 1>"));
+    assert_ne!(iv!("<0, 1>"), iv!("<0, 2>"));
 }
 
 #[test]

@@ -10,5 +10,8 @@ keywords = ["interval-arithmetic", "correct-rounding", "arbitrary-precision", "m
 categories = ["algorithms", "api-bindings", "data-structures", "science"]
 license = "Apache-2.0"
 
+[features]
+strict = []
+
 [dependencies]
 libc = "0.*"

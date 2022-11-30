@@ -18,12 +18,6 @@ macro_rules! b {
     };
 }
 
-macro_rules! iv {
-    ($s:expr) => {
-        IV::from_str_with_prec($s, PREC).unwrap()
-    };
-}
-
 macro_rules! ivs {
     ($s:expr) => {
         IVS::from_str_with_prec($s, PREC).unwrap()
@@ -189,11 +183,11 @@ fn test_into_vec() {
 
 #[test]
 fn test_partial_eq() {
-    assert!(ivs!("{}") == ivs!("{}"));
-    assert!(ivs!("{0}") == ivs!("{0}"));
-    assert!(ivs!("{<0, 1>}") == ivs!("{<0, 1>}"));
-    assert!(ivs!("{<0, 1>; 2}") == ivs!("{<0, 1>; 2}"));
-    assert!(ivs!("{<0, 1>; 2}") != ivs!("{<0, 1>; 3}"));
+    assert_eq!(ivs!("{}"), ivs!("{}"));
+    assert_eq!(ivs!("{0}"), ivs!("{0}"));
+    assert_eq!(ivs!("{<0, 1>}"), ivs!("{<0, 1>}"));
+    assert_eq!(ivs!("{<0, 1>; 2}"), ivs!("{<0, 1>; 2}"));
+    assert_ne!(ivs!("{<0, 1>; 2}"), ivs!("{<0, 1>; 3}"));
 }
 
 #[test]

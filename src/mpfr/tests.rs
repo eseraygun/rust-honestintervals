@@ -81,7 +81,6 @@ fn test_clone() {
 
 #[test]
 fn test_into_f64() {
-    use std::f64;
     assert_eq!(0f64, mpfr!("0", 113).into());
     assert_eq!(1.0, mpfr!("0.99999999999999999", 113).into());
     assert_eq!(1.0, mpfr!("1.0000000000000001", 113).into());
@@ -94,12 +93,12 @@ fn test_into_f64() {
 
 #[test]
 fn test_partial_eq() {
-    assert!(mpfr!("0") == mpfr!("0"));
-    assert!(mpfr!("0") == mpfr!("0", PREC + 1));
-    assert!(mpfr!("0") != mpfr!("1"));
-    assert!(mpfr!("inf") == mpfr!("inf"));
-    assert!(mpfr!("-inf") == mpfr!("-inf"));
-    assert!(mpfr!("NaN") != mpfr!("NaN"));
+    assert_eq!(mpfr!("0"), mpfr!("0"));
+    assert_eq!(mpfr!("0"), mpfr!("0", PREC + 1));
+    assert_ne!(mpfr!("0"), mpfr!("1"));
+    assert_eq!(mpfr!("inf"), mpfr!("inf"));
+    assert_eq!(mpfr!("-inf"), mpfr!("-inf"));
+    assert_ne!(mpfr!("NaN"), mpfr!("NaN"));
 }
 
 #[test]
@@ -206,7 +205,6 @@ fn test_from_str_hi() {
 #[test]
 fn test_into_lo_f64() {
     use fp::Into;
-    use std::f64;
     assert_eq!(
         0.9999999999999999,
         mpfr!("0.99999999999999999", 113).into_lo()
@@ -225,7 +223,6 @@ fn test_into_lo_f64() {
 #[test]
 fn test_into_hi_f64() {
     use fp::Into;
-    use std::f64;
     assert_eq!(1.0, mpfr!("0.99999999999999999", 113).into_hi());
     assert_eq!(
         1.0000000000000002,

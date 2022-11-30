@@ -2,8 +2,6 @@ use fp;
 use fp::{Float, Sign};
 use transc::Transc;
 
-use std::f64;
-
 impl Transc for f64 {
     type Output = Self;
 
@@ -159,7 +157,6 @@ mod tests {
     #[test]
     fn test_from_lo() {
         use fp::From;
-        use std::f64;
         assert_eq!(1.1000000000000001, f64::from_lo(1.1, PREC));
         assert_eq!(0.9000000000000000, f64::from_lo(0.9, PREC));
         assert_eq!(f64::INFINITY, f64::from_lo(f64::INFINITY, PREC));
@@ -170,7 +167,6 @@ mod tests {
     #[test]
     fn test_from_hi() {
         use fp::From;
-        use std::f64;
         assert_eq!(1.1000000000000001, f64::from_hi(1.1, PREC));
         assert_eq!(0.9000000000000000, f64::from_hi(0.9, PREC));
         assert_eq!(f64::INFINITY, f64::from_hi(f64::INFINITY, PREC));
@@ -181,7 +177,6 @@ mod tests {
     #[test]
     fn test_from_str_lo() {
         use fp::FromStr;
-        use std::f64;
         assert_eq!(0.9, f64::from_str_lo("0.9", PREC).unwrap());
         assert_eq!(1.1, f64::from_str_lo("1.1", PREC).unwrap());
         assert_eq!(0.0000000000000000, f64::from_str_lo("0", PREC).unwrap());
@@ -195,7 +190,6 @@ mod tests {
     #[test]
     fn test_from_str_hi() {
         use fp::FromStr;
-        use std::f64;
         assert_eq!(0.0000000000000000, f64::from_str_hi("0", PREC).unwrap());
         assert_eq!(0.9000000000000000, f64::from_str_hi("0.9", PREC).unwrap());
         assert_eq!(1.1000000000000001, f64::from_str_hi("1.1", PREC).unwrap());
@@ -209,7 +203,6 @@ mod tests {
     #[test]
     fn test_into_lo_f64() {
         use fp::Into;
-        use std::f64;
         assert_eq!(0.9999999999999999, 0.9999999999999999.into_lo());
         assert_eq!(1.000000000000001, 1.000000000000001.into_lo());
         assert_eq!(-0.9999999999999999, -0.9999999999999999.into_lo());
@@ -222,7 +215,6 @@ mod tests {
     #[test]
     fn test_into_hi_f64() {
         use fp::Into;
-        use std::f64;
         assert_eq!(0.9999999999999999, 0.9999999999999999.into_hi());
         assert_eq!(1.000000000000001, 1.000000000000001.into_hi());
         assert_eq!(-0.9999999999999999, -0.9999999999999999.into_hi());
@@ -330,34 +322,25 @@ mod tests {
     fn test_exp_lo() {
         use fp::Transc;
         assert_eq!(2.718281828459045, 1.0.exp_lo());
-        // Actual: 2.7182818284590452353602874713527
-        assert_eq!(0.36787944117144233, (-1.0).exp_lo()); // incorrect
-                                                          // Actual: 0.36787944117144232159552377016146
-        assert_eq!(1.6487212707001282, 0.5.exp_lo()); // incorrect
-                                                      // Actual: 1.6487212707001281468486507878142
+        assert_eq!(0.36787944117144233, (-1.0).exp_lo());
+        assert_eq!(1.6487212707001282, 0.5.exp_lo());
         assert_eq!(0.6065306597126334, (-0.5).exp_lo());
-        // Actual: 0.60653065971263342360379953499118
     }
 
     #[test]
     fn test_exp_hi() {
         use fp::Transc;
         assert_eq!(2.7182818284590453, 1.0.exp_hi());
-        // Actual: 2.7182818284590452353602874713527
         assert_eq!(0.36787944117144233, (-1.0).exp_hi());
-        // Actual: 0.36787944117144232159552377016146
         assert_eq!(1.6487212707001282, 0.5.exp_hi());
-        // Actual: 1.6487212707001281468486507878142
-        assert_eq!(0.6065306597126334, (-0.5).exp_hi()); // incorrect
-                                                         // Actual: 0.60653065971263342360379953499118
+        assert_eq!(0.6065306597126334, (-0.5).exp_hi());
     }
 
     #[test]
     fn test_pow_lo() {
         use fp::Transc;
         assert_eq!(1.0, 1.0.pow_lo(2.0));
-        assert_eq!(1.4142135623730951, 2.0.pow_lo(0.5)); // incorrect
-                                                         // Actual: 1.4142135623730950488016887242097
+        assert_eq!(1.4142135623730951, 2.0.pow_lo(0.5));
     }
 
     #[test]
@@ -365,13 +348,11 @@ mod tests {
         use fp::Transc;
         assert_eq!(1.0, 1.0.pow_hi(2.0));
         assert_eq!(1.4142135623730951, 2.0.pow_hi(0.5));
-        // Actual: 1.4142135623730950488016887242097
     }
 
     #[test]
     fn test_constants() {
         use fp::Float;
-        use std::f64;
         assert_eq!(0.0, f64::zero(PREC));
         assert_eq!(f64::INFINITY, f64::one(PREC) / f64::zero(PREC));
         assert_eq!(0.0, f64::neg_zero(PREC));

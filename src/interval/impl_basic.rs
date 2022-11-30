@@ -77,7 +77,7 @@ impl<BOUND: Float> Interval<BOUND> {
             lo,
             hi
         );
-        Interval { lo: lo, hi: hi }
+        Interval { lo, hi }
     }
 
     /// Constructs the minimal interval that covers all of the given intervals.
@@ -94,7 +94,7 @@ impl<BOUND: Float> Interval<BOUND> {
             .iter()
             .map(|i| i.hi.clone())
             .fold(BOUND::neg_infinity(precision), |x, y| x.max(y));
-        Self { lo: lo, hi: hi }
+        Self { lo, hi }
     }
 
     /// Constructs a singleton interval (an interval with only one element).
@@ -199,7 +199,7 @@ impl<BOUND: Float> Interval<BOUND> {
     /// Returns the precision of `self`.
     #[inline]
     pub fn precision(&self) -> usize {
-        assert!(self.lo.precision() == self.hi.precision());
+        assert_eq!(self.lo.precision(), self.hi.precision());
         self.lo.precision()
     }
 
@@ -231,7 +231,7 @@ impl<BOUND: Float> Interval<BOUND> {
     /// Whether `self` is NaN (empty).
     #[inline]
     pub fn is_nan(&self) -> bool {
-        assert!(self.lo.is_nan() == self.hi.is_nan());
+        assert_eq!(self.lo.is_nan(), self.hi.is_nan());
         self.lo.is_nan()
     }
 
