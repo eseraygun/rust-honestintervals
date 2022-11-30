@@ -9,28 +9,36 @@ impl Mpfr {
     #[inline]
     fn add_custom(mut self, rhs: Mpfr, rounding_mode: MpfrRnd) -> Self {
         assert_eq!(self.precision(), rhs.precision());
-        unsafe { mpfr_add(&mut self.mpfr, &self.mpfr, &rhs.mpfr, rounding_mode); }
+        unsafe {
+            mpfr_add(&mut self.mpfr, &self.mpfr, &rhs.mpfr, rounding_mode);
+        }
         self
     }
 
     #[inline]
     fn sub_custom(mut self, rhs: Mpfr, rounding_mode: MpfrRnd) -> Self {
         assert_eq!(self.precision(), rhs.precision());
-        unsafe { mpfr_sub(&mut self.mpfr, &self.mpfr, &rhs.mpfr, rounding_mode); }
+        unsafe {
+            mpfr_sub(&mut self.mpfr, &self.mpfr, &rhs.mpfr, rounding_mode);
+        }
         self
     }
 
     #[inline]
     fn mul_custom(mut self, rhs: Mpfr, rounding_mode: MpfrRnd) -> Self {
         assert_eq!(self.precision(), rhs.precision());
-        unsafe { mpfr_mul(&mut self.mpfr, &self.mpfr, &rhs.mpfr, rounding_mode); }
+        unsafe {
+            mpfr_mul(&mut self.mpfr, &self.mpfr, &rhs.mpfr, rounding_mode);
+        }
         self
     }
 
     #[inline]
     fn div_custom(mut self, rhs: Mpfr, rounding_mode: MpfrRnd) -> Self {
         assert_eq!(self.precision(), rhs.precision());
-        unsafe { mpfr_div(&mut self.mpfr, &self.mpfr, &rhs.mpfr, rounding_mode); }
+        unsafe {
+            mpfr_div(&mut self.mpfr, &self.mpfr, &rhs.mpfr, rounding_mode);
+        }
         self
     }
 }

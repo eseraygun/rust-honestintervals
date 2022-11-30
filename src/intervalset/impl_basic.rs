@@ -35,7 +35,7 @@ impl<BOUND: Float> IntervalSet<BOUND> {
     pub fn from_intervals(mut intervals: Vec<Interval<BOUND>>) -> Self {
         intervals.retain(|i| !i.is_nan());
         if intervals.is_empty() {
-            return Self::empty()
+            return Self::empty();
         }
         intervals.sort_by(|i, j| {
             if i.lo < j.lo {
@@ -61,7 +61,9 @@ impl<BOUND: Float> IntervalSet<BOUND> {
             }
         }
         optimized_intervals.push(Interval::new(lo, hi));
-        Self { intervals: optimized_intervals }
+        Self {
+            intervals: optimized_intervals,
+        }
     }
 
     /// Constructs an interval set of one singleton interval.
@@ -99,7 +101,10 @@ impl<BOUND: Float> IntervalSet<BOUND> {
     /// Constructs an interval set from a float with given precision.
     #[inline]
     pub fn from_with_prec(val: f64, precision: usize) -> Self {
-        Self::new(BOUND::from_lo(val, precision), BOUND::from_hi(val, precision))
+        Self::new(
+            BOUND::from_lo(val, precision),
+            BOUND::from_hi(val, precision),
+        )
     }
 
     /// Constructs an interval set by parsing a string.
@@ -112,17 +117,26 @@ impl<BOUND: Float> IntervalSet<BOUND> {
         if let Ok(i) = Interval::from_str_with_prec(s, precision) {
             Ok(IntervalSet::from_interval(i))
         } else {
-            if !s.starts_with('{') { return Err(ParseIntervalSetError::MissingOpeningBraces) }
+            if !s.starts_with('{') {
+                return Err(ParseIntervalSetError::MissingOpeningBraces);
+            }
             let s = s.trim_left_matches('{').trim_left();
-            if !s.ends_with('}') { return Err(ParseIntervalSetError::MissingClosingBraces) }
+            if !s.ends_with('}') {
+                return Err(ParseIntervalSetError::MissingClosingBraces);
+            }
             let s = s.trim_right_matches('}').trim_right();
-            if s.is_empty() { return Ok(Self::empty()) }
-            let mut results: Vec<_> = s.split(';')
+            if s.is_empty() {
+                return Ok(Self::empty());
+            }
+            let mut results: Vec<_> = s
+                .split(';')
                 .map(|v| v.trim())
                 .map(|v| Interval::from_str_with_prec(v, precision))
                 .collect();
             if results.iter().all(|i| i.is_ok()) {
-                Ok(Self::from_intervals(results.drain(..).map(|i| i.unwrap()).collect()))
+                Ok(Self::from_intervals(
+                    results.drain(..).map(|i| i.unwrap()).collect(),
+                ))
             } else {
                 Err(ParseIntervalSetError::IntervalsParseError)
             }
@@ -156,7 +170,8 @@ impl<BOUND: Float> IntervalSet<BOUND> {
     /// Performs a binary operation by performing it on all pairs of intervals of `self` and `rhs`.
     #[inline]
     pub fn binary_op<OP>(self, rhs: Self, op: OP) -> Self
-        where OP: Fn(Interval<BOUND>, Interval<BOUND>) -> Vec<Interval<BOUND>>
+    where
+        OP: Fn(Interval<BOUND>, Interval<BOUND>) -> Vec<Interval<BOUND>>,
     {
         let mut intervals = Vec::<Interval<BOUND>>::new();
         for i in &self.intervals {
@@ -191,12 +206,20 @@ impl<BOUND: Float> Display for IntervalSet<BOUND> {
         } else if self.intervals.len() == 1 {
             Display::fmt(&self.intervals[0], f)
         } else {
-            if let Err(e) = f.write_char('{') { return Err(e) }
+            if let Err(e) = f.write_char('{') {
+                return Err(e);
+            }
             let mut iter = self.intervals.iter();
-            if let Err(e) = Display::fmt(&iter.next().unwrap(), f) { return Err(e) }
+            if let Err(e) = Display::fmt(&iter.next().unwrap(), f) {
+                return Err(e);
+            }
             for i in iter {
-                if let Err(e) = f.write_str("; ") { return Err(e) }
-                if let Err(e) = Display::fmt(&i, f) { return Err(e) }
+                if let Err(e) = f.write_str("; ") {
+                    return Err(e);
+                }
+                if let Err(e) = Display::fmt(&i, f) {
+                    return Err(e);
+                }
             }
             f.write_char('}')
         }

@@ -3,9 +3,9 @@ mod capi;
 mod def;
 mod impl_basic;
 mod impl_cmp;
+mod impl_float;
 mod impl_ops;
 mod impl_transc;
-mod impl_float;
 
 #[cfg(test)]
 mod tests;

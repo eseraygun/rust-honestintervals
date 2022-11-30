@@ -1,5 +1,5 @@
 /// Trait for transcendental functions.
-pub trait Transc<RHS=Self> {
+pub trait Transc<RHS = Self> {
     /// Output type.
     type Output;
     /// Computes the natural logarithm of `self`.

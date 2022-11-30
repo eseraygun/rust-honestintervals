@@ -9,7 +9,7 @@ impl PartialEq<Mpfr> for Mpfr {
         if unsafe { mpfr_unordered_p(&self.mpfr, &other.mpfr) } == 0 {
             unsafe { mpfr_equal_p(&self.mpfr, &other.mpfr) != 0 }
         } else {
-            false  // self or other is NaN and they cannot be compared
+            false // self or other is NaN and they cannot be compared
         }
     }
 }
@@ -27,7 +27,7 @@ impl PartialOrd<Mpfr> for Mpfr {
                 Some(Ordering::Equal)
             }
         } else {
-            None  // self or other is NaN and they cannot be compared
+            None // self or other is NaN and they cannot be compared
         }
     }
 

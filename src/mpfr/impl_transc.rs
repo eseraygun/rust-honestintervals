@@ -6,19 +6,25 @@ use transc::Transc;
 impl Mpfr {
     #[inline]
     fn log_custom(mut self, rounding_mode: MpfrRnd) -> Self {
-        unsafe { mpfr_log(&mut self.mpfr, &self.mpfr, rounding_mode); }
+        unsafe {
+            mpfr_log(&mut self.mpfr, &self.mpfr, rounding_mode);
+        }
         self
     }
 
     #[inline]
     fn exp_custom(mut self, rounding_mode: MpfrRnd) -> Self {
-        unsafe { mpfr_exp(&mut self.mpfr, &self.mpfr, rounding_mode); }
+        unsafe {
+            mpfr_exp(&mut self.mpfr, &self.mpfr, rounding_mode);
+        }
         self
     }
 
     #[inline]
     fn pow_custom(mut self, rhs: Self, rounding_mode: MpfrRnd) -> Self {
-        unsafe { mpfr_pow(&mut self.mpfr, &self.mpfr, &rhs.mpfr, rounding_mode); }
+        unsafe {
+            mpfr_pow(&mut self.mpfr, &self.mpfr, &rhs.mpfr, rounding_mode);
+        }
         self
     }
 }

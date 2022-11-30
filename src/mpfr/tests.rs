@@ -8,8 +8,12 @@ macro_rules! assert_str_eq {
 }
 
 macro_rules! mpfr {
-    ($v:expr) => { ::mpfr::Mpfr::from_str_with_prec($v, PREC).unwrap() };
-    ($v:expr, $p:expr) => { ::mpfr::Mpfr::from_str_with_prec($v, $p).unwrap() };
+    ($v:expr) => {
+        ::mpfr::Mpfr::from_str_with_prec($v, PREC).unwrap()
+    };
+    ($v:expr, $p:expr) => {
+        ::mpfr::Mpfr::from_str_with_prec($v, $p).unwrap()
+    };
 }
 
 #[test]
@@ -29,10 +33,22 @@ fn test_from_f64() {
 fn test_from_str() {
     use std::str::FromStr;
     assert_str_eq!("0", Mpfr::from_str("0").unwrap());
-    assert_str_eq!("0.9999999999999999", Mpfr::from_str("0.9999999999999999").unwrap());
-    assert_str_eq!("1.000000000000001", Mpfr::from_str("1.000000000000001").unwrap());
-    assert_str_eq!("-0.9999999999999999", Mpfr::from_str("-0.9999999999999999").unwrap());
-    assert_str_eq!("-1.000000000000001", Mpfr::from_str("-1.000000000000001").unwrap());
+    assert_str_eq!(
+        "0.9999999999999999",
+        Mpfr::from_str("0.9999999999999999").unwrap()
+    );
+    assert_str_eq!(
+        "1.000000000000001",
+        Mpfr::from_str("1.000000000000001").unwrap()
+    );
+    assert_str_eq!(
+        "-0.9999999999999999",
+        Mpfr::from_str("-0.9999999999999999").unwrap()
+    );
+    assert_str_eq!(
+        "-1.000000000000001",
+        Mpfr::from_str("-1.000000000000001").unwrap()
+    );
     assert_str_eq!("inf", Mpfr::from_str("inf").unwrap());
     assert_str_eq!("-inf", Mpfr::from_str("-inf").unwrap());
     assert_str_eq!("NaN", Mpfr::from_str("NaN").unwrap());
@@ -40,10 +56,18 @@ fn test_from_str() {
 
 #[test]
 fn test_from_str_custom_failures() {
-    assert_eq!(ParseMpfrError::CStringError,
-               Mpfr::from_str_custom("0\00", PREC, MpfrRnd::HalfToEven).err().unwrap());
-    assert_eq!(ParseMpfrError::MpfrParseError,
-               Mpfr::from_str_custom("0a0", PREC, MpfrRnd::HalfToEven).err().unwrap());
+    assert_eq!(
+        ParseMpfrError::CStringError,
+        Mpfr::from_str_custom("0\00", PREC, MpfrRnd::HalfToEven)
+            .err()
+            .unwrap()
+    );
+    assert_eq!(
+        ParseMpfrError::MpfrParseError,
+        Mpfr::from_str_custom("0a0", PREC, MpfrRnd::HalfToEven)
+            .err()
+            .unwrap()
+    );
 }
 
 #[test]
@@ -81,13 +105,31 @@ fn test_partial_eq() {
 #[test]
 fn test_partial_ord_cmp() {
     use std::cmp::Ordering;
-    assert_eq!(Ordering::Equal, mpfr!("0").partial_cmp(&mpfr!("0")).unwrap());
+    assert_eq!(
+        Ordering::Equal,
+        mpfr!("0").partial_cmp(&mpfr!("0")).unwrap()
+    );
     assert_eq!(Ordering::Less, mpfr!("0").partial_cmp(&mpfr!("1")).unwrap());
-    assert_eq!(Ordering::Greater, mpfr!("1").partial_cmp(&mpfr!("0")).unwrap());
-    assert_eq!(Ordering::Equal, mpfr!("-inf").partial_cmp(&mpfr!("-inf")).unwrap());
-    assert_eq!(Ordering::Equal, mpfr!("inf").partial_cmp(&mpfr!("inf")).unwrap());
-    assert_eq!(Ordering::Less, mpfr!("-inf").partial_cmp(&mpfr!("inf")).unwrap());
-    assert_eq!(Ordering::Greater, mpfr!("inf").partial_cmp(&mpfr!("-inf")).unwrap());
+    assert_eq!(
+        Ordering::Greater,
+        mpfr!("1").partial_cmp(&mpfr!("0")).unwrap()
+    );
+    assert_eq!(
+        Ordering::Equal,
+        mpfr!("-inf").partial_cmp(&mpfr!("-inf")).unwrap()
+    );
+    assert_eq!(
+        Ordering::Equal,
+        mpfr!("inf").partial_cmp(&mpfr!("inf")).unwrap()
+    );
+    assert_eq!(
+        Ordering::Less,
+        mpfr!("-inf").partial_cmp(&mpfr!("inf")).unwrap()
+    );
+    assert_eq!(
+        Ordering::Greater,
+        mpfr!("inf").partial_cmp(&mpfr!("-inf")).unwrap()
+    );
     assert!(mpfr!("NaN").partial_cmp(&mpfr!("NaN")).is_none());
 }
 
@@ -165,10 +207,16 @@ fn test_from_str_hi() {
 fn test_into_lo_f64() {
     use fp::Into;
     use std::f64;
-    assert_eq!(0.9999999999999999, mpfr!("0.99999999999999999", 113).into_lo());
+    assert_eq!(
+        0.9999999999999999,
+        mpfr!("0.99999999999999999", 113).into_lo()
+    );
     assert_eq!(1.0, mpfr!("1.0000000000000001", 113).into_lo());
     assert_eq!(-1.0, mpfr!("-0.99999999999999999", 113).into_lo());
-    assert_eq!(-1.0000000000000002, mpfr!("-1.0000000000000001", 113).into_lo());
+    assert_eq!(
+        -1.0000000000000002,
+        mpfr!("-1.0000000000000001", 113).into_lo()
+    );
     assert_eq!(f64::INFINITY, mpfr!("inf", 113).into_lo());
     assert_eq!(f64::NEG_INFINITY, mpfr!("-inf", 113).into_lo());
     assert!(Into::<f64>::into_lo(mpfr!("nan", 113)).is_nan());
@@ -179,8 +227,14 @@ fn test_into_hi_f64() {
     use fp::Into;
     use std::f64;
     assert_eq!(1.0, mpfr!("0.99999999999999999", 113).into_hi());
-    assert_eq!(1.0000000000000002, mpfr!("1.0000000000000001", 113).into_hi());
-    assert_eq!(-0.9999999999999999, mpfr!("-0.99999999999999999", 113).into_hi());
+    assert_eq!(
+        1.0000000000000002,
+        mpfr!("1.0000000000000001", 113).into_hi()
+    );
+    assert_eq!(
+        -0.9999999999999999,
+        mpfr!("-0.99999999999999999", 113).into_hi()
+    );
     assert_eq!(-1.0, mpfr!("-1.0000000000000001", 113).into_hi());
     assert_eq!(f64::INFINITY, mpfr!("inf", 113).into_hi());
     assert_eq!(f64::NEG_INFINITY, mpfr!("-inf", 113).into_hi());

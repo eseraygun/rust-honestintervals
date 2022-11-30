@@ -8,44 +8,64 @@ impl Transc for f64 {
     type Output = Self;
 
     #[inline]
-    fn log(self) -> Self::Output { self.ln() }
+    fn log(self) -> Self::Output {
+        self.ln()
+    }
 
     #[inline]
-    fn exp(self) -> Self::Output { self.exp() }
+    fn exp(self) -> Self::Output {
+        self.exp()
+    }
 
     #[inline]
-    fn pow(self, rhs: Self) -> Self::Output { self.powf(rhs) }
+    fn pow(self, rhs: Self) -> Self::Output {
+        self.powf(rhs)
+    }
 }
 
 impl fp::From<f64> for f64 {
     #[inline]
-    fn from_lo(val: f64, _: usize) -> Self { val }
+    fn from_lo(val: f64, _: usize) -> Self {
+        val
+    }
 
     #[inline]
-    fn from_hi(val: f64, _: usize) -> Self { val }
+    fn from_hi(val: f64, _: usize) -> Self {
+        val
+    }
 }
 
 impl fp::FromStr for f64 {}
 
 impl fp::Into<f64> for f64 {
     #[inline]
-    fn into_lo(self) -> f64 { self }
+    fn into_lo(self) -> f64 {
+        self
+    }
 
     #[inline]
-    fn into_hi(self) -> f64 { self }
+    fn into_hi(self) -> f64 {
+        self
+    }
 }
 
 impl fp::MinMax for f64 {
     #[inline]
-    fn min(self, rhs: Self) -> Self { self.min(rhs) }
+    fn min(self, rhs: Self) -> Self {
+        self.min(rhs)
+    }
 
     #[inline]
-    fn max(self, rhs: Self) -> Self { self.max(rhs) }
+    fn max(self, rhs: Self) -> Self {
+        self.max(rhs)
+    }
 }
 
 impl fp::Abs for f64 {
     #[inline]
-    fn abs(self) -> Self { self.abs() }
+    fn abs(self) -> Self {
+        self.abs()
+    }
 }
 
 impl fp::Add for f64 {}
@@ -311,10 +331,10 @@ mod tests {
         use fp::Transc;
         assert_eq!(2.718281828459045, 1.0.exp_lo());
         // Actual: 2.7182818284590452353602874713527
-        assert_eq!(0.36787944117144233, (-1.0).exp_lo());  // incorrect
-        // Actual: 0.36787944117144232159552377016146
-        assert_eq!(1.6487212707001282, 0.5.exp_lo());  // incorrect
-        // Actual: 1.6487212707001281468486507878142
+        assert_eq!(0.36787944117144233, (-1.0).exp_lo()); // incorrect
+                                                          // Actual: 0.36787944117144232159552377016146
+        assert_eq!(1.6487212707001282, 0.5.exp_lo()); // incorrect
+                                                      // Actual: 1.6487212707001281468486507878142
         assert_eq!(0.6065306597126334, (-0.5).exp_lo());
         // Actual: 0.60653065971263342360379953499118
     }
@@ -328,16 +348,16 @@ mod tests {
         // Actual: 0.36787944117144232159552377016146
         assert_eq!(1.6487212707001282, 0.5.exp_hi());
         // Actual: 1.6487212707001281468486507878142
-        assert_eq!(0.6065306597126334, (-0.5).exp_hi());  // incorrect
-        // Actual: 0.60653065971263342360379953499118
+        assert_eq!(0.6065306597126334, (-0.5).exp_hi()); // incorrect
+                                                         // Actual: 0.60653065971263342360379953499118
     }
 
     #[test]
     fn test_pow_lo() {
         use fp::Transc;
         assert_eq!(1.0, 1.0.pow_lo(2.0));
-        assert_eq!(1.4142135623730951, 2.0.pow_lo(0.5));  // incorrect
-        // Actual: 1.4142135623730950488016887242097
+        assert_eq!(1.4142135623730951, 2.0.pow_lo(0.5)); // incorrect
+                                                         // Actual: 1.4142135623730950488016887242097
     }
 
     #[test]

@@ -87,7 +87,9 @@ impl Mpfr {
 impl Drop for Mpfr {
     #[inline]
     fn drop(&mut self) {
-        unsafe { mpfr_clear(&mut self.mpfr); }
+        unsafe {
+            mpfr_clear(&mut self.mpfr);
+        }
     }
 }
 
@@ -108,10 +110,11 @@ impl From<f64> for Mpfr {
 
 impl Mpfr {
     /// Constructs an MPFR from an `&str` with custom precision and rounding mode.
-    pub fn from_str_custom(s: &str,
-                           precision: usize,
-                           rounding_mode: MpfrRnd)
-                           -> Result<Self, ParseMpfrError> {
+    pub fn from_str_custom(
+        s: &str,
+        precision: usize,
+        rounding_mode: MpfrRnd,
+    ) -> Result<Self, ParseMpfrError> {
         if let Ok(c) = CString::new(s) {
             if let Some(res) = unsafe { Mpfr::uninitialized(precision) }.set_str(c, rounding_mode) {
                 Ok(res)

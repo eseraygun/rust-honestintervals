@@ -29,16 +29,20 @@ impl Display for SignClass {
         match *self {
             SignClass::Mixed => f.write_str("m"),
             SignClass::Zero => f.write_str("z"),
-            SignClass::Positive(has_zero) => if has_zero {
-                f.write_str("p0")
-            } else {
-                f.write_str("p1")
-            },
-            SignClass::Negative(has_zero) => if has_zero {
-                f.write_str("n0")
-            } else {
-                f.write_str("n1")
-            },
+            SignClass::Positive(has_zero) => {
+                if has_zero {
+                    f.write_str("p0")
+                } else {
+                    f.write_str("p1")
+                }
+            }
+            SignClass::Negative(has_zero) => {
+                if has_zero {
+                    f.write_str("n0")
+                } else {
+                    f.write_str("n1")
+                }
+            }
         }
     }
 }
@@ -53,12 +57,26 @@ impl<BOUND: Float> Interval<BOUND> {
     /// are empty sets. If you want to represent an empty set, use `Interval::nan()`.
     #[inline]
     pub fn new(lo: BOUND, hi: BOUND) -> Self {
-        assert_eq!(lo.precision(), hi.precision(),
-                   "inconsistent precision: {} != {}", lo.precision(), hi.precision());
-        assert!(!lo.is_nan() && !hi.is_nan() && lo <= hi || lo.is_nan() && hi.is_nan(),
-                "invalid bounds: <{}, {}>", lo, hi);
-        assert!(!(lo.is_infinity() && hi.is_infinity()) && !(lo.is_neg_infinity() && hi.is_neg_infinity()),
-                "invalid bounds: <{}, {}>", lo, hi);
+        assert_eq!(
+            lo.precision(),
+            hi.precision(),
+            "inconsistent precision: {} != {}",
+            lo.precision(),
+            hi.precision()
+        );
+        assert!(
+            !lo.is_nan() && !hi.is_nan() && lo <= hi || lo.is_nan() && hi.is_nan(),
+            "invalid bounds: <{}, {}>",
+            lo,
+            hi
+        );
+        assert!(
+            !(lo.is_infinity() && hi.is_infinity())
+                && !(lo.is_neg_infinity() && hi.is_neg_infinity()),
+            "invalid bounds: <{}, {}>",
+            lo,
+            hi
+        );
         Interval { lo: lo, hi: hi }
     }
 
@@ -66,12 +84,14 @@ impl<BOUND: Float> Interval<BOUND> {
     pub fn minimal_cover(mut intervals: Vec<Self>, precision: usize) -> Self {
         intervals.retain(|i| !i.is_nan());
         if intervals.is_empty() {
-            return Self::nan(precision)
+            return Self::nan(precision);
         }
-        let lo = intervals.iter()
+        let lo = intervals
+            .iter()
             .map(|i| i.lo.clone())
             .fold(BOUND::infinity(precision), |x, y| x.min(y));
-        let hi = intervals.iter()
+        let hi = intervals
+            .iter()
             .map(|i| i.hi.clone())
             .fold(BOUND::neg_infinity(precision), |x, y| x.max(y));
         Self { lo: lo, hi: hi }
@@ -110,7 +130,10 @@ impl<BOUND: Float> Interval<BOUND> {
     /// Constructs an interval from a float with given precision.
     #[inline]
     pub fn from_with_prec(val: f64, precision: usize) -> Self {
-        Self::new(BOUND::from_lo(val, precision), BOUND::from_hi(val, precision))
+        Self::new(
+            BOUND::from_lo(val, precision),
+            BOUND::from_hi(val, precision),
+        )
     }
 
     /// Constructs an interval by parsing a string.
@@ -124,9 +147,13 @@ impl<BOUND: Float> Interval<BOUND> {
         if let (Ok(lo), Ok(hi)) = (lo, hi) {
             Ok(Self::new(lo, hi))
         } else {
-            if !s.starts_with('<') { return Err(ParseIntervalError::MissingOpeningBracket) }
+            if !s.starts_with('<') {
+                return Err(ParseIntervalError::MissingOpeningBracket);
+            }
             let s = s.trim_left_matches('<').trim_left();
-            if !s.ends_with('>') { return Err(ParseIntervalError::MissingClosingBracket) }
+            if !s.ends_with('>') {
+                return Err(ParseIntervalError::MissingClosingBracket);
+            }
             let s = s.trim_right_matches('>').trim_right();
             let p: Vec<&str> = s.split(',').collect();
             if p.len() == 2 {
@@ -262,10 +289,18 @@ impl<BOUND: Float> Display for Interval<BOUND> {
         if self.is_singleton() || self.is_nan() {
             Display::fmt(&self.lo, f)
         } else {
-            if let Err(e) = f.write_char('<') { return Err(e) }
-            if let Err(e) = Display::fmt(&self.lo, f) { return Err(e) }
-            if let Err(e) = f.write_str(", ") { return Err(e) }
-            if let Err(e) = Display::fmt(&self.hi, f) { return Err(e) }
+            if let Err(e) = f.write_char('<') {
+                return Err(e);
+            }
+            if let Err(e) = Display::fmt(&self.lo, f) {
+                return Err(e);
+            }
+            if let Err(e) = f.write_str(", ") {
+                return Err(e);
+            }
+            if let Err(e) = Display::fmt(&self.hi, f) {
+                return Err(e);
+            }
             f.write_char('>')
         }
     }

@@ -31,7 +31,8 @@ impl<BOUND: Float> Interval<BOUND> {
         assert!(rhs.sign_class().is_negative());
 
         let mut pos_intervals = self.pow_p_p_multi(-rhs);
-        let res = pos_intervals.drain(..)
+        let res = pos_intervals
+            .drain(..)
             .flat_map(|i| Interval::one(i.precision()).div_multi(i))
             .collect();
         res
@@ -68,10 +69,10 @@ impl<BOUND: Float> Interval<BOUND> {
         let precision = self.precision();
 
         if self.is_nan() {
-            return vec![]
+            return vec![];
         }
         if rhs.is_nan() {
-            return vec![]
+            return vec![];
         }
         if rhs.is_zero() {
             return vec![Self::one(precision)];
@@ -97,22 +98,15 @@ impl<BOUND: Float> Transc for Interval<BOUND> {
 
     fn log(self) -> Self::Output {
         match self.sign_class() {
-            SignClass::Mixed => Self::new(
-                BOUND::neg_infinity(self.precision()),
-                self.hi.log_hi(),
-            ),
+            SignClass::Mixed => Self::new(BOUND::neg_infinity(self.precision()), self.hi.log_hi()),
             SignClass::Zero => Self::nan(self.precision()),
-            SignClass::Positive(has_zero) => if has_zero {
-                Self::new(
-                    BOUND::neg_infinity(self.precision()),
-                    self.hi.log_hi(),
-                )
-            } else {
-                Self::new(
-                    self.lo.log_lo(),
-                    self.hi.log_hi(),
-                )
-            },
+            SignClass::Positive(has_zero) => {
+                if has_zero {
+                    Self::new(BOUND::neg_infinity(self.precision()), self.hi.log_hi())
+                } else {
+                    Self::new(self.lo.log_lo(), self.hi.log_hi())
+                }
+            }
             SignClass::Negative(_) => Self::nan(self.precision()),
         }
     }
