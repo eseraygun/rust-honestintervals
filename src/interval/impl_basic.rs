@@ -150,11 +150,11 @@ impl<BOUND: Float> Interval<BOUND> {
             if !s.starts_with('<') {
                 return Err(ParseIntervalError::MissingOpeningBracket);
             }
-            let s = s.trim_left_matches('<').trim_left();
+            let s = s.trim_start_matches('<').trim_start();
             if !s.ends_with('>') {
                 return Err(ParseIntervalError::MissingClosingBracket);
             }
-            let s = s.trim_right_matches('>').trim_right();
+            let s = s.trim_end_matches('>').trim_end();
             let p: Vec<&str> = s.split(',').collect();
             if p.len() == 2 {
                 let lo = BOUND::from_str_lo(p[0].trim(), precision);
@@ -287,7 +287,8 @@ impl<BOUND: Float> FromStr for Interval<BOUND> {
 impl<BOUND: Float> Display for Interval<BOUND> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         if self.is_singleton() || self.is_nan() {
-            Display::fmt(&self.lo, f)
+            // `self.lo` may be printed as -0, so we prefer `self.hi`.
+            Display::fmt(&self.hi, f)
         } else {
             if let Err(e) = f.write_char('<') {
                 return Err(e);

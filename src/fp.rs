@@ -19,19 +19,19 @@ pub enum Sign {
 /// Finite precision version of the `std::convert::From` trait.
 pub trait From<T> {
     /// Converts `T` into `Self` and rounds down inexact representations.
-    fn from_lo(T, precision: usize) -> Self;
+    fn from_lo(_: T, precision: usize) -> Self;
     /// Converts `T` into `Self` and rounds up inexact representations.
-    fn from_hi(T, precision: usize) -> Self;
+    fn from_hi(_: T, precision: usize) -> Self;
 }
 
 /// Finite precision version of the `std::str::FromStr` trait.
 pub trait FromStr: Sized + str::FromStr {
     /// Parses `Self` and rounds down inexact representations.
-    fn from_str_lo(s: &str, usize) -> Result<Self, Self::Err> {
+    fn from_str_lo(s: &str, _: usize) -> Result<Self, Self::Err> {
         Self::from_str(s)
     }
     /// Parses `Self` and rounds up inexact representations.
-    fn from_str_hi(s: &str, usize) -> Result<Self, Self::Err> {
+    fn from_str_hi(s: &str, _: usize) -> Result<Self, Self::Err> {
         Self::from_str(s)
     }
 }

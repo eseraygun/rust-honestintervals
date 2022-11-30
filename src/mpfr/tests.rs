@@ -258,7 +258,8 @@ fn test_max() {
 #[test]
 fn test_neg() {
     use std::ops::Neg;
-    assert_str_eq!("0", mpfr!("0").neg());
+    assert_str_eq!("-0", mpfr!("0").neg());
+    assert_str_eq!("0", mpfr!("-0").neg());
     assert_str_eq!("-1", mpfr!("1").neg());
     assert_str_eq!("1", mpfr!("-1").neg());
 }
@@ -374,7 +375,7 @@ fn test_constants() {
     use fp::Float;
     assert_str_eq!("0", Mpfr::zero(PREC));
     assert_str_eq!("inf", Mpfr::one(PREC) / Mpfr::zero(PREC));
-    assert_str_eq!("0", Mpfr::neg_zero(PREC));
+    assert_str_eq!("-0", Mpfr::neg_zero(PREC));
     assert_str_eq!("-inf", Mpfr::one(PREC) / Mpfr::neg_zero(PREC));
     assert_str_eq!("1", Mpfr::one(PREC));
     assert_str_eq!("inf", Mpfr::infinity(PREC));

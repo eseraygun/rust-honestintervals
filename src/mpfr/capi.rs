@@ -1,3 +1,5 @@
+/// Struct and functions definitions for the GNU MPFR library. See
+/// http://www.mpfr.org/mpfr-current/mpfr.html for details.
 use libc::{c_char, c_double, c_int, c_long, c_longlong};
 
 /// MPFR rounding mode enum.
@@ -39,7 +41,6 @@ pub struct MpfrStruct {
 type MpfrPtr = *mut MpfrStruct;
 type MpfrConstPtr = *const MpfrStruct;
 
-/// External calls to MPFR library. See http://www.mpfr.org/mpfr-current/mpfr.html for details.
 #[allow(missing_docs)]
 #[link(name = "mpfr")]
 extern "C" {

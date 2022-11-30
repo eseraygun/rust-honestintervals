@@ -6,16 +6,18 @@ use fp::Float;
 use std::ffi::CString;
 use std::fmt;
 use std::fmt::{Display, Formatter};
-use std::mem::uninitialized;
+use std::mem::MaybeUninit;
 use std::str::FromStr;
 
 impl Mpfr {
     /// Constructs an uninitialized MPFR.
     #[inline]
     pub unsafe fn uninitialized(precision: usize) -> Self {
-        let mut mpfr = uninitialized();
-        mpfr_init2(&mut mpfr, precision as MpfrPrec);
-        Self { mpfr: mpfr }
+        let mut mpfr = MaybeUninit::uninit();
+        mpfr_init2(mpfr.assume_init_mut(), precision as MpfrPrec);
+        Self {
+            mpfr: mpfr.assume_init(),
+        }
     }
 
     /// Sets the value of `self` to zero.

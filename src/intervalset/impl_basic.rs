@@ -120,11 +120,11 @@ impl<BOUND: Float> IntervalSet<BOUND> {
             if !s.starts_with('{') {
                 return Err(ParseIntervalSetError::MissingOpeningBraces);
             }
-            let s = s.trim_left_matches('{').trim_left();
+            let s = s.trim_start_matches('{').trim_start();
             if !s.ends_with('}') {
                 return Err(ParseIntervalSetError::MissingClosingBraces);
             }
-            let s = s.trim_right_matches('}').trim_right();
+            let s = s.trim_end_matches('}').trim_end();
             if s.is_empty() {
                 return Ok(Self::empty());
             }
