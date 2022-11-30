@@ -10,6 +10,9 @@ impl<BOUND: Float> Interval<BOUND> {
 
         let precision = self.precision();
         let mut intervals = Vec::<Self>::new();
+        if rhs.has_zero() {
+            intervals.push(Self::one(self.precision()));
+        }
         let (self_01, self_1i) = self.split(BOUND::one(precision));
         if !self_1i.is_nan() {
             intervals.push(Self::new(
@@ -43,12 +46,12 @@ impl<BOUND: Float> Interval<BOUND> {
 
         let mut intervals = Vec::<Self>::new();
         let precision = rhs.precision();
-        let (other_n, other_p) = rhs.split(BOUND::zero(precision));
-        if !other_p.is_nan() {
-            intervals.append(&mut self.clone().pow_p_p_multi(other_p));
+        let (rhs_n, rhs_p) = rhs.split(BOUND::zero(precision));
+        if !rhs_p.is_nan() {
+            intervals.append(&mut self.clone().pow_p_p_multi(rhs_p));
         }
-        if !other_n.is_nan() {
-            intervals.append(&mut self.pow_p_n_multi(other_n));
+        if !rhs_n.is_nan() {
+            intervals.append(&mut self.pow_p_n_multi(rhs_n));
         }
         intervals
     }
@@ -78,7 +81,11 @@ impl<BOUND: Float> Interval<BOUND> {
             return vec![Self::one(precision)];
         }
         if self.is_zero() {
-            return vec![self];
+            return if rhs.has_zero() {
+                vec![Self::zero(self.precision()), Self::one(self.precision())]
+            } else {
+                vec![self]
+            }
         }
 
         let mut intervals = Vec::<Self>::new();
