@@ -329,6 +329,7 @@ fn test_add() {
     test_binary_op(
         IV::add,
         simple(),
+        simple(),
         vec![
             ("nan.*", "NaN"),
             ("whl.*", "<-inf, inf>"),
@@ -352,6 +353,7 @@ fn test_sub() {
     use std::ops::Sub;
     test_binary_op(
         IV::sub,
+        simple(),
         simple(),
         vec![
             ("nan.*", "NaN"),
@@ -385,6 +387,7 @@ fn test_mul() {
     test_binary_op(
         IV::mul,
         all_sign_classes(),
+        all_sign_classes(),
         vec![
             ("nan.*", "NaN"),
             ("z.*", "0"),
@@ -414,6 +417,7 @@ fn test_div() {
     use std::ops::Div;
     test_binary_op(
         IV::div,
+        all_sign_classes(),
         all_sign_classes(),
         vec![
             ("nan.*", "NaN"),
@@ -495,7 +499,7 @@ fn test_exp() {
 #[test]
 fn test_pow() {
     use transc::Transc;
-    test_binary_op_2(
+    test_binary_op(
         IV::pow,
         all_sign_classes_small_and_big(),
         all_sign_classes(),
@@ -651,7 +655,7 @@ pub fn test_unary_op<'a, OP, R>(
     print: bool,
 ) where
     OP: Fn(IV) -> R,
-    R: ::std::fmt::Display + Sized,
+    R: std::fmt::Display + Sized,
 {
     for (cx, x) in cases {
         let z = op(x.clone());
@@ -669,7 +673,7 @@ pub fn test_unary_op<'a, OP, R>(
     }
 }
 
-pub fn test_binary_op_2<'a, OP, R>(
+pub fn test_binary_op<'a, OP, R>(
     op: OP,
     left_cases: Vec<(&'a str, IV)>,
     right_cases: Vec<(&'a str, IV)>,
@@ -711,16 +715,4 @@ pub fn test_binary_op_2<'a, OP, R>(
     if !unmatched_cases.is_empty() {
         panic!("unmatched case(s):\n{}", unmatched_cases.join("\n"));
     }
-}
-
-pub fn test_binary_op<'a, OP, R>(
-    op: OP,
-    cases: Vec<(&'a str, IV)>,
-    expected: Vec<(&str, &str)>,
-    commutative: bool,
-) where
-    OP: Fn(IV, IV) -> R,
-    R: std::fmt::Display + Sized,
-{
-    test_binary_op_2(op, cases.clone(), cases, expected, commutative);
 }

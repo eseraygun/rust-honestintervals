@@ -319,6 +319,7 @@ fn test_add() {
     test_binary_op(
         IV::add,
         simple(),
+        simple(),
         vec![
             ("nan.*", "NaN"),
             ("whl.*", "<-inf, inf>"),
@@ -342,6 +343,7 @@ fn test_sub() {
     use std::ops::Sub;
     test_binary_op(
         IV::sub,
+        simple(),
         simple(),
         vec![
             ("nan.*", "NaN"),
@@ -375,6 +377,7 @@ fn test_mul() {
     test_binary_op(
         IV::mul,
         all_sign_classes(),
+        all_sign_classes(),
         vec![
             ("nan.*", "NaN"),
             ("z.*", "0"),
@@ -404,6 +407,7 @@ fn test_div() {
     use std::ops::Div;
     test_binary_op(
         IV::div,
+        all_sign_classes(),
         all_sign_classes(),
         vec![
             ("nan.*", "NaN"),
@@ -528,7 +532,8 @@ pub fn test_unary_op<'a, OP, R>(
 
 pub fn test_binary_op<'a, OP, R>(
     op: OP,
-    cases: Vec<(&'a str, IV)>,
+    left_cases: Vec<(&'a str, IV)>,
+    right_cases: Vec<(&'a str, IV)>,
     mut expected: Vec<(&str, &str)>,
     commutative: bool,
 ) where
@@ -547,8 +552,8 @@ pub fn test_binary_op<'a, OP, R>(
     expected = expected_up_to_now;
 
     let mut unmatched_cases = Vec::<String>::new();
-    for (cx, x) in cases.clone() {
-        for (cy, y) in cases.clone() {
+    for (cx, x) in left_cases.clone() {
+        for (cy, y) in right_cases.clone() {
             let z = op(x.clone(), y.clone());
             if let Some(cz) = find_binary_case(&expected, cx, cy, commutative) {
                 assert_str_eq!(String::from(cz), z, "{}.{} ({} . {})", cx, cy, x, y);
