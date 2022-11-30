@@ -662,7 +662,7 @@ fn find_binary_case<'x, 'y, 'z>(
 pub fn test_unary_op<'a, OP, R>(op: OP, cases: Vec<(&'a str, IVS)>, expected: Vec<(&str, &str)>)
 where
     OP: Fn(IVS) -> R,
-    R: ::std::fmt::Display + Sized,
+    R: std::fmt::Display + Sized,
 {
     let mut unmatched_cases = Vec::<String>::new();
     for (cx, x) in cases {
@@ -685,7 +685,7 @@ pub fn test_binary_op<'a, OP, R>(
     commutative: bool,
 ) where
     OP: Fn(IVS, IVS) -> R,
-    R: ::std::fmt::Display + Sized,
+    R: std::fmt::Display + Sized,
 {
     let mut expected_up_to_now = Vec::<(&str, &str)>::new();
     for (cz, z) in expected.drain(..) {

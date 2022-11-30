@@ -508,7 +508,7 @@ pub fn test_unary_op<'a, OP, R>(
     print: bool,
 ) where
     OP: Fn(IV) -> R,
-    R: ::std::fmt::Display + Sized,
+    R: std::fmt::Display + Sized,
 {
     for (cx, x) in cases {
         let z = op(x.clone());
@@ -533,7 +533,7 @@ pub fn test_binary_op<'a, OP, R>(
     commutative: bool,
 ) where
     OP: Fn(IV, IV) -> R,
-    R: ::std::fmt::Display + Sized,
+    R: std::fmt::Display + Sized,
 {
     let mut expected_up_to_now = Vec::<(&str, &str)>::new();
     for (cz, z) in expected.drain(..) {
