@@ -291,4 +291,9 @@ impl Float for Mpfr {
     fn is_nan(&self) -> bool {
         unsafe { mpfr_nan_p(&self.mpfr) != 0 }
     }
+
+    #[inline]
+    fn has_odd_denominator(&self) -> bool {
+        (unsafe { mpfr_integer_p(&self.mpfr) }) != 0
+    }
 }

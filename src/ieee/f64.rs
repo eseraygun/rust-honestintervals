@@ -148,6 +148,10 @@ impl Float for f64 {
     fn is_nan(&self) -> bool {
         f64::is_nan(*self)
     }
+
+    fn has_odd_denominator(&self) -> bool {
+        self.floor() == *self
+    }
 }
 
 #[cfg(test)]

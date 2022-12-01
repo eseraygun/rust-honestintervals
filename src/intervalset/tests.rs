@@ -519,6 +519,17 @@ fn test_pow() {
         ],
         false,
     );
+    assert_str_eq!("1", ivs!("1").pow(ivs!("2")));
+    assert_str_eq!("1", ivs!("1").pow(ivs!("3")));
+    assert_str_eq!("1", ivs!("1").pow(ivs!("0.5")));
+    assert_str_eq!("<1, 4>", ivs!("<-2, -1>").pow(ivs!("2")));
+    assert_str_eq!("<-8, -1>", ivs!("<-2, -1>").pow(ivs!("3")));
+    assert_str_eq!("{}", ivs!("<-2, -1>").pow(ivs!("0.5")));
+    assert_str_eq!("<0.5, 1>", ivs!("<1, 2>").pow(ivs!("-1")));
+    assert_str_eq!("<-1, -0.5>", ivs!("<-2, -1>").pow(ivs!("-1")));
+    assert_str_eq!("<0, 4>", ivs!("<-2, 2>").pow(ivs!("2")));
+    assert_str_eq!("<-8, 8>", ivs!("<-2, 2>").pow(ivs!("3")));
+    assert_str_eq!("{<-inf, -0.5>; <0.5, inf>}", ivs!("<-2, 2>").pow(ivs!("-1")));
 }
 
 fn simple<'a>() -> Vec<(&'a str, IVS)> {

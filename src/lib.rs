@@ -16,6 +16,7 @@
 //! can create a correctly rounding interval right away by calling `IntervalSet::<Mpfr>::new()`.
 
 extern crate libc;
+extern crate core;
 
 /// Finite precision module.
 ///

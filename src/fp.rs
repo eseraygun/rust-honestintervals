@@ -189,4 +189,7 @@ pub trait Float:
     fn is_neg_infinity(&self) -> bool;
     /// Whether `self` is NaN.
     fn is_nan(&self) -> bool;
+
+    /// Whether the canonical rational representation of `self` has an odd denominator.
+    fn has_odd_denominator(&self) -> bool;
 }

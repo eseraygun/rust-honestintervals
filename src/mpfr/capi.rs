@@ -1,6 +1,6 @@
 /// Struct and functions definitions for the GNU MPFR library. See
 /// http://www.mpfr.org/mpfr-current/mpfr.html for details.
-use libc::{c_char, c_double, c_int, c_long, c_longlong};
+use libc::{c_char, c_double, c_int, c_long, c_ulong};
 
 /// MPFR rounding mode enum.
 #[repr(C)]
@@ -26,7 +26,7 @@ pub type MpfrSign = c_int;
 /// MPFR exponent type.
 pub type MpfrExp = c_long;
 /// MPFR limb type.
-pub type MpLimb = c_longlong;
+pub type MpLimb = c_ulong;
 
 /// Low-level MPFR struct.
 #[repr(C)]
@@ -72,6 +72,9 @@ extern "C" {
     pub fn mpfr_lessequal_p(op1: MpfrConstPtr, op2: MpfrConstPtr) -> c_int;
     pub fn mpfr_equal_p(op1: MpfrConstPtr, op2: MpfrConstPtr) -> c_int;
     pub fn mpfr_unordered_p(op1: MpfrConstPtr, op2: MpfrConstPtr) -> c_int;
+
+    // Integer and remainder related functions.
+    pub fn mpfr_integer_p(op: MpfrConstPtr) -> c_int;
 
     // Basic arithmetic functions.
     pub fn mpfr_neg(rop: MpfrPtr, op: MpfrConstPtr, rnd: MpfrRnd) -> c_int;
