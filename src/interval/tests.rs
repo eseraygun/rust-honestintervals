@@ -502,7 +502,7 @@ fn test_pow() {
     test_binary_op(
         IV::pow,
         all_sign_classes_small_and_big(),
-        all_sign_classes(),
+        all_sign_classes_with_singletons(),
         vec![
             ("nan.*", "NaN"),
             ("*.nan", "NaN"),
@@ -511,7 +511,14 @@ fn test_pow() {
             ("z.m", "<0, 1>"),
             ("z.p0", "<0, 1>"),
             ("z.n0", "<0, 1>"),
+            ("z.m1", "NaN"),
+            ("z.m2", "NaN"),
+            ("z.mh", "NaN"),
             ("z.*", "0"),
+            ("whl.2", "<0, inf>"),
+            ("whl.m2", "<0, inf>"),
+            ("whl.h", "<0, inf>"),
+            ("whl.mh", "<0, inf>"),
             ("whl.*", "<-inf, inf>"),
             ("m.whl", "<-inf, inf>"),
             ("m.m", "<-inf, inf>"),
@@ -519,68 +526,111 @@ fn test_pow() {
             ("m.p1", "<-1, 1>"),
             ("m.n0", "<-inf, inf>"),
             ("m.n1", "<-inf, inf>"),
+            ("m.1", "<-1, 1>"),
+            ("m.m1", "<-inf, inf>"),
+            ("m.2", "<0, 1>"),
+            ("m.m2", "<1, inf>"),
+            ("m.h", "<0, 1>"),
+            ("m.mh", "<1, inf>"),
             ("p0s.whl", "<0, inf>"),
             ("p0s.m", "<0, inf>"),
             ("p0s.p0", "<0, 1>"),
             ("p0s.p1", "<0, 0.75>"),
             ("p0s.n0", "<1, inf>"),
             ("p0s.n1", "<1, inf>"),
+            ("p0s.1", "<0, 0.75>"),
+            ("p0s.m1", "<1, inf>"),
+            ("p0s.2", "<0, 0.75>"),
+            ("p0s.m2", "<1, inf>"),
+            ("p0s.h", "<0, 1>"),
+            ("p0s.mh", "<1, inf>"),
             ("p0b.whl", "<0, inf>"),
             ("p0b.m", "<0, inf>"),
             ("p0b.p0", "<0, 1.5>"),
             ("p0b.p1", "<0, 3>"),
             ("p0b.n0", "<0.5, inf>"),
             ("p0b.n1", "<0.25, inf>"),
+            ("p0b.1", "<0, 1.5>"),
+            ("p0b.m1", "<0.5, inf>"),
+            ("p0b.2", "<0, 3>"),
+            ("p0b.m2", "<0.25, inf>"),
+            ("p0b.h", "<0, 1.5>"),
+            ("p0b.mh", "<0.5, inf>"),
             ("p1s.whl", "<0, inf>"),
             ("p1s.m", "<0.5, 2>"),
             ("p1s.p0", "<0.75, 2>"),
             ("p1s.p1", "<0.5, 4>"),
             ("p1s.n0", "<0.5, 1.5>"),
             ("p1s.n1", "<0.25, 2>"),
+            ("p1s.1", "<0.75, 2>"),
+            ("p1s.m1", "<0.5, 1.5>"),
+            ("p1s.2", "<0.5, 4>"),
+            ("p1s.m2", "<0.25, 2>"),
+            ("p1s.h", "<0.75, 1.5>"),
+            ("p1s.mh", "<0.5, 1.5>"),
             ("p1b.whl", "<0, inf>"),
             ("p1b.m", "<0.5, 2>"),
             ("p1b.p0", "<1, 2>"),
             ("p1b.p1", "<1.5, 4>"),
             ("p1b.n0", "<0.5, 1>"),
             ("p1b.n1", "<0.25, 0.75>"),
+            ("p1b.1", "<1.5, 2>"),
+            ("p1b.m1", "<0.5, 0.75>"),
+            ("p1b.2", "<2, 4>"),
+            ("p1b.m2", "<0.25, 0.5>"),
+            ("p1b.h", "<1, 1.5>"),
+            ("p1b.mh", "<0.5, 1>"),
             ("n0s.whl", "<-inf, inf>"),
             ("n0s.m", "<-inf, inf>"),
             ("n0s.p0", "<-1, 1>"),
             ("n0s.p1", "<-0.75, 0.75>"),
             ("n0s.n0", "<-inf, inf>"),
             ("n0s.n1", "<-inf, inf>"),
+            ("n0s.1", "<-0.75, 0>"),
+            ("n0s.m1", "<-inf, -1>"),
+            ("n0s.2", "<0, 0.75>"),
+            ("n0s.m2", "<1, inf>"),
+            ("n0s.h", "0"),
+            ("n0s.mh", "NaN"),
             ("n0b.whl", "<-inf, inf>"),
             ("n0b.m", "<-inf, inf>"),
             ("n0b.p0", "<-1.5, 1.5>"),
             ("n0b.p1", "<-3, 3>"),
             ("n0b.n0", "<-inf, inf>"),
             ("n0b.n1", "<-inf, inf>"),
+            ("n0b.1", "<-1.5, 0>"),
+            ("n0b.m1", "<-inf, -0.5>"),
+            ("n0b.2", "<0, 3>"),
+            ("n0b.m2", "<0.25, inf>"),
+            ("n0b.h", "0"),
+            ("n0b.mh", "NaN"),
             ("n1s.whl", "<-inf, inf>"),
             ("n1s.m", "<-2, 2>"),
             ("n1s.p0", "<-2, 2>"),
             ("n1s.p1", "<-4, 4>"),
             ("n1s.n0", "<-1.5, 1.5>"),
             ("n1s.n1", "<-2, 2>"),
+            ("n1s.1", "<-2, -0.75>"),
+            ("n1s.m1", "<-1.5, -0.5>"),
+            ("n1s.2", "<0.5, 4>"),
+            ("n1s.m2", "<0.25, 2>"),
+            ("n1s.h", "NaN"),
+            ("n1s.mh", "NaN"),
             ("n1b.whl", "<-inf, inf>"),
             ("n1b.m", "<-2, 2>"),
             ("n1b.p0", "<-2, 2>"),
             ("n1b.p1", "<-4, 4>"),
             ("n1b.n0", "<-1, 1>"),
             ("n1b.n1", "<-0.75, 0.75>"),
+            ("n1b.1", "<-2, -1.5>"),
+            ("n1b.m1", "<-0.75, -0.5>"),
+            ("n1b.2", "<2, 4>"),
+            ("n1b.m2", "<0.25, 0.5>"),
+            ("n1b.h", "NaN"),
+            ("n1b.mh", "NaN"),
         ],
         false,
     );
-    assert_str_eq!("1", iv!("1").pow(iv!("2")));
-    assert_str_eq!("1", iv!("1").pow(iv!("3")));
-    assert_str_eq!("1", iv!("1").pow(iv!("0.5")));
-    assert_str_eq!("<1, 4>", iv!("<-2, -1>").pow(iv!("2")));
-    assert_str_eq!("<-8, -1>", iv!("<-2, -1>").pow(iv!("3")));
-    assert_str_eq!("NaN", iv!("<-2, -1>").pow(iv!("0.5")));
-    assert_str_eq!("<0.5, 1>", iv!("<1, 2>").pow(iv!("-1")));
-    assert_str_eq!("<-1, -0.5>", iv!("<-2, -1>").pow(iv!("-1")));
-    assert_str_eq!("<0, 4>", iv!("<-2, 2>").pow(iv!("2")));
-    assert_str_eq!("<-8, 8>", iv!("<-2, 2>").pow(iv!("3")));
-    assert_str_eq!("<-inf, inf>", iv!("<-2, 2>").pow(iv!("-1")));
 }
 
 fn simple<'a>() -> Vec<(&'a str, IV)> {
@@ -604,6 +654,26 @@ fn all_sign_classes<'a>() -> Vec<(&'a str, IV)> {
         ("p1", iv!("<1, 2>")),
         ("n0", iv!("<-1, 0>")),
         ("n1", iv!("<-2, -1>")),
+    ]
+}
+
+fn all_sign_classes_with_singletons<'a>() -> Vec<(&'a str, IV)> {
+    vec![
+        ("nan", iv!("NaN")),
+        ("whl", iv!("<-inf, inf>")),
+        ("m", iv!("<-1, 1>")),
+        ("z", iv!("0")),
+        ("p0", iv!("<0, 1>")),
+        ("p1", iv!("<1, 2>")),
+        ("n0", iv!("<-1, 0>")),
+        ("n1", iv!("<-2, -1>")),
+        ("n1", iv!("<-2, -1>")),
+        ("1", iv!("1")),
+        ("m1", iv!("-1")),
+        ("2", iv!("2")),
+        ("m2", iv!("-2")),
+        ("h", iv!("0.5")),
+        ("mh", iv!("-0.5")),
     ]
 }
 
@@ -705,23 +775,22 @@ pub fn test_binary_op<'a, OP, R>(
     }
     expected = expected_up_to_now;
 
+    let mut failed_cases = Vec::<String>::new();
     let mut unmatched_cases = Vec::<String>::new();
-    let mut failed = false;
     for (cx, x) in left_cases.clone() {
         for (cy, y) in right_cases.clone() {
             let z = op(x.clone(), y.clone());
             if let Some(cz) = find_binary_case(&expected, cx, cy, commutative) {
                 if String::from(cz) != format!("{}", z) {
-                    failed = true;
-                    eprintln!("{}.{} ({} . {} != {})", cx, cy, x, y, z);
+                    failed_cases.push(format!("    (\"{}.{}\", \"{}\"),", cx, cy, z));
                 }
             } else {
                 unmatched_cases.push(format!("    (\"{}.{}\", \"{}\"),", cx, cy, z));
             }
         }
     }
-    if failed {
-        panic!("one or more tests has failed");
+    if !failed_cases.is_empty() {
+        panic!("failed case(s):\n{}", failed_cases.join("\n"));
     }
     if !unmatched_cases.is_empty() {
         panic!("unmatched case(s):\n{}", unmatched_cases.join("\n"));
