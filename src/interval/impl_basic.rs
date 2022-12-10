@@ -8,7 +8,7 @@ use std::str::FromStr;
 
 impl SignClass {
     /// Whether `self` is `SignClass::Positive(_)`.
-    pub fn is_positive(&self) -> bool {
+    pub fn is_non_negative(&self) -> bool {
         match *self {
             SignClass::Positive(_) => true,
             _ => false,
@@ -16,7 +16,7 @@ impl SignClass {
     }
 
     /// Whether `self` is `SignClass::Negative(_)`.
-    pub fn is_negative(&self) -> bool {
+    pub fn is_non_positive(&self) -> bool {
         match *self {
             SignClass::Negative(_) => true,
             _ => false,
@@ -253,17 +253,15 @@ impl<BOUND: Float> Interval<BOUND> {
     #[inline]
     pub fn split(self, val: BOUND) -> (Self, Self) {
         let precision = self.precision();
-        if self.lo >= val {
+        if self.is_nan() {
+            let precision = self.precision();
+            (Self::nan(precision), Self::nan(precision))
+        } else if self.lo >= val {
             (Self::nan(precision), self)
         } else if self.hi <= val {
             (self, Self::nan(precision))
         } else {
-            if self.is_nan() {
-                let precision = self.precision();
-                (Self::nan(precision), Self::nan(precision))
-            } else {
-                (Self::new(self.lo, val.clone()), Self::new(val, self.hi))
-            }
+            (Self::new(self.lo, val.clone()), Self::new(val, self.hi))
         }
     }
 }
